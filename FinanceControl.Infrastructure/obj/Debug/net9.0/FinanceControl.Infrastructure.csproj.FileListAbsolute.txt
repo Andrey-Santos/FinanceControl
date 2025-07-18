@@ -1,0 +1,34 @@
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.AssemblyInfo.cs
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.deps.json
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.dll
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.pdb
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Core.dll
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Core.pdb
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceC.6FBE02E6.Up2Date
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.dll
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\refint\FinanceControl.Infrastructure.dll
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.pdb
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\ref\FinanceControl.Infrastructure.dll
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.runtimeconfig.json
+C:\Users\Andrey Santos\source\repos\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.genruntimeconfig.cache
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.deps.json
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.runtimeconfig.json
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.dll
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Infrastructure.pdb
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Core.dll
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\bin\Debug\net9.0\FinanceControl.Core.pdb
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.csproj.AssemblyReference.cache
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.AssemblyInfoInputs.cache
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.AssemblyInfo.cs
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceC.6FBE02E6.Up2Date
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.dll
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\refint\FinanceControl.Infrastructure.dll
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.pdb
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\FinanceControl.Infrastructure.genruntimeconfig.cache
+C:\Dev\FinanceControl\FinanceControl.Infrastructure\obj\Debug\net9.0\ref\FinanceControl.Infrastructure.dll

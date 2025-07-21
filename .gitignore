@@ -482,3 +482,28 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+ 
+# Arquivos de configuração de ambiente e secrets
+appsettings.*.json
+secrets.json
+
+# Dumps de memória
+*.dmp
+
+# Cache do NuGet
+.nuget/
+
+# Bancos de dados SQLite e outros
+*.sqlite
+*.db
+
+# Relatórios de testes e cobertura
+TestResults/
+coverage/
+
+# Arquivos temporários do Windows
+*.tmp
+
+# Rider (JetBrains)
+*.sln.iml
+.idea/

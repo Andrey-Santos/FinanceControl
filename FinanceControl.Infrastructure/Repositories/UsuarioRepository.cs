@@ -8,4 +8,9 @@ namespace FinanceControl.Infrastructure.Repositories;
 public class UsuarioRepository : BaseRepository<Usuario>, IUsuarioRepository
 {
     public UsuarioRepository(FinanceDbContext context) : base(context) { }
+
+    public async Task<Usuario?> GetByUsernameAsync(string nome)
+    {
+        return await _dbSet.FirstOrDefaultAsync(u => u.Nome == nome);
+    }
 }

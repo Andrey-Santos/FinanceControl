@@ -1,15 +1,16 @@
 using FinanceControl.Core.Domain.Entities;
 using FinanceControl.Core.Domain.Interfaces;
+using FinanceControl.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceControl.Infrastructure.Repositories;
 
 public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : EntityBase
 {
-    protected readonly DbContext _context;
+    protected readonly FinanceDbContext _context;
     protected readonly DbSet<TEntity> _dbSet;
 
-    public BaseRepository(DbContext context)
+    public BaseRepository(FinanceDbContext context)
     {
         _context = context;
         _dbSet = context.Set<TEntity>();

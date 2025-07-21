@@ -1,7 +1,9 @@
 using FinanceControl.Core.Domain.Entities;
 using FinanceControl.Core.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class BaseController<TEntity, TCreateDto, TResponseDto, TUseCase> : ControllerBase

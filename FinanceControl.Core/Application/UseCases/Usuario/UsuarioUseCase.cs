@@ -1,5 +1,6 @@
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.Usuario;
+using BCrypt.Net;
 
 namespace FinanceControl.Core.Application.UseCases.Usuario;
 
@@ -39,6 +40,7 @@ public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuari
         var usuario = new Domain.Entities.Usuario
         {
             Nome = dto.Nome,
+            SenhaHash =  BCrypt.Net.BCrypt.HashPassword(dto.Senha),
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
         };

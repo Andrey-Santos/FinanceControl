@@ -22,7 +22,7 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
             Id = u.Id,
             Apelido = u.Apelido,
             ContaBancariaId = u.ContaBancariaId,
-            DataFechamento = u.DataFechamento,
+            DiaFechamento = u.DiaFechamento,
             Tipo = u.Tipo,
             Limite = u.Limite
         });
@@ -36,7 +36,7 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
             Id = Cartao.Id,
             Apelido = Cartao.Apelido,
             ContaBancariaId = Cartao.ContaBancariaId,
-            DataFechamento = Cartao.DataFechamento,
+            DiaFechamento = Cartao.DiaFechamento,
             Tipo = Cartao.Tipo,
             Limite = Cartao.Limite
         };
@@ -48,7 +48,7 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
         {
             Apelido = dto.Apelido,
             ContaBancariaId = dto.ContaBancariaId,
-            DataFechamento = dto.DataFechamento,
+            DiaFechamento = dto.DiaFechamento,
             Tipo = dto.Tipo,
             Limite = dto.Limite,
             DataCadastro = DateTime.UtcNow,
@@ -68,7 +68,7 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
         Cartao.DataAlteracao = DateTime.UtcNow;
         Cartao.Apelido = dto.Apelido;
         Cartao.ContaBancariaId = dto.ContaBancariaId;
-        Cartao.DataFechamento = dto.DataFechamento;
+        Cartao.DiaFechamento = dto.DiaFechamento;
         Cartao.Tipo = dto.Tipo;
         Cartao.Limite = dto.Limite;
 

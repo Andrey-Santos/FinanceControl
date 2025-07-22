@@ -3,14 +3,16 @@ using FinanceControl.Core.Application.DTOs.Fatura;
 
 namespace FinanceControl.Core.Application.UseCases.Fatura;
 
-public class FaturaUseCase : IBaseUseCase<Domain.Entities.Fatura, CreateFaturaDto, FaturaResponseDto>
+public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, CreateFaturaDto, FaturaResponseDto>
 {
     private readonly IFaturaRepository _repository;
+    private readonly ICartaoRepository _cartaoRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public FaturaUseCase(IFaturaRepository repository, IUnitOfWork unitOfWork)
+    public FaturaUseCase(IFaturaRepository repository, ICartaoRepository cartaoRepository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _cartaoRepository = cartaoRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -40,6 +42,8 @@ public class FaturaUseCase : IBaseUseCase<Domain.Entities.Fatura, CreateFaturaDt
 
     public async Task AddAsync(CreateFaturaDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_cartaoRepository, dto.CartaoId, "Cartão");
+
         var Fatura = new Domain.Entities.Fatura
         {
             CartaoId = dto.CartaoId,
@@ -55,6 +59,8 @@ public class FaturaUseCase : IBaseUseCase<Domain.Entities.Fatura, CreateFaturaDt
 
     public async Task UpdateAsync(long id, CreateFaturaDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_cartaoRepository, dto.CartaoId, "Cartão");
+
         var Fatura = await _repository.GetByIdAsync(id);
         if (Fatura == null)
             return;

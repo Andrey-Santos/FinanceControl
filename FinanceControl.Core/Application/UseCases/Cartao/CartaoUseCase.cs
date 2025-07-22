@@ -3,14 +3,16 @@ using FinanceControl.Core.Application.DTOs.Cartao;
 
 namespace FinanceControl.Core.Application.UseCases.Cartao;
 
-public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDto, CartaoResponseDto>
+public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDto, CartaoResponseDto>
 {
     private readonly ICartaoRepository _repository;
+    private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CartaoUseCase(ICartaoRepository repository, IUnitOfWork unitOfWork)
+    public CartaoUseCase(ICartaoRepository repository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _contaBancariaRepository = contaBancariaRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -44,6 +46,8 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
 
     public async Task AddAsync(CreateCartaoDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
+
         var Cartao = new Domain.Entities.Cartao
         {
             Apelido = dto.Apelido,
@@ -61,6 +65,8 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
 
     public async Task UpdateAsync(long id, CreateCartaoDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
+        
         var Cartao = await _repository.GetByIdAsync(id);
         if (Cartao == null)
             return;
@@ -81,4 +87,5 @@ public class CartaoUseCase : IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDt
         await _repository.DeleteAsync(id);
         await _unitOfWork.CommitAsync();
     }
+    
 }

@@ -3,14 +3,18 @@ using FinanceControl.Core.Application.DTOs.ContaBancaria;
 
 namespace FinanceControl.Core.Application.UseCases.ContaBancaria;
 
-public class ContaBancariaUseCase : IBaseUseCase<Domain.Entities.ContaBancaria, CreateContaBancariaDto, ContaBancariaResponseDto>
+public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.ContaBancaria, CreateContaBancariaDto, ContaBancariaResponseDto>
 {
     private readonly IContaBancariaRepository _repository;
+    private readonly IBancoRepository _bancoRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ContaBancariaUseCase(IContaBancariaRepository repository, IUnitOfWork unitOfWork)
+    public ContaBancariaUseCase(IContaBancariaRepository repository, IBancoRepository bancoRepository, IUsuarioRepository usuarioRepository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _bancoRepository = bancoRepository;
+        _usuarioRepository = usuarioRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -40,6 +44,9 @@ public class ContaBancariaUseCase : IBaseUseCase<Domain.Entities.ContaBancaria, 
 
     public async Task AddAsync(CreateContaBancariaDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_usuarioRepository, dto.UsuarioId, "Usuário");
+        await ValidarEntidadeExistenteAsync(_bancoRepository, dto.BancoId, "Banco");
+
         var ContaBancaria = new Domain.Entities.ContaBancaria
         {
             Numero = dto.Numero,
@@ -55,6 +62,9 @@ public class ContaBancariaUseCase : IBaseUseCase<Domain.Entities.ContaBancaria, 
 
     public async Task UpdateAsync(long id, CreateContaBancariaDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_usuarioRepository, dto.UsuarioId, "Usuário");
+        await ValidarEntidadeExistenteAsync(_bancoRepository, dto.BancoId, "Banco");
+        
         var ContaBancaria = await _repository.GetByIdAsync(id);
         if (ContaBancaria == null)
             return;

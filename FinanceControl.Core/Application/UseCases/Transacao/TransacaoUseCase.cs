@@ -3,14 +3,18 @@ using FinanceControl.Core.Application.DTOs.Transacao;
 
 namespace FinanceControl.Core.Application.UseCases.Transacao;
 
-public class TransacaoUseCase : IBaseUseCase<Domain.Entities.Transacao, CreateTransacaoDto, TransacaoResponseDto>
+public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transacao, CreateTransacaoDto, TransacaoResponseDto>
 {
     private readonly ITransacaoRepository _repository;
+    private readonly ITipoTransacaoRepository _tipoTransacaoRepository;
+    private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransacaoUseCase(ITransacaoRepository repository, IUnitOfWork unitOfWork)
+    public TransacaoUseCase(ITransacaoRepository repository, ITipoTransacaoRepository tipoRepository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _tipoTransacaoRepository = tipoRepository;
+        _contaBancariaRepository = contaBancariaRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -44,6 +48,9 @@ public class TransacaoUseCase : IBaseUseCase<Domain.Entities.Transacao, CreateTr
 
     public async Task AddAsync(CreateTransacaoDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
+        await ValidarEntidadeExistenteAsync(_tipoTransacaoRepository, dto.TipoId, "Tipo de transação");
+
         var Transacao = new Domain.Entities.Transacao
         {
             Descricao = dto.Descricao,
@@ -61,6 +68,9 @@ public class TransacaoUseCase : IBaseUseCase<Domain.Entities.Transacao, CreateTr
 
     public async Task UpdateAsync(long id, CreateTransacaoDto dto)
     {
+        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
+        await ValidarEntidadeExistenteAsync(_tipoTransacaoRepository, dto.TipoId, "Tipo de transação");
+        
         var Transacao = await _repository.GetByIdAsync(id);
         if (Transacao == null)
             return;

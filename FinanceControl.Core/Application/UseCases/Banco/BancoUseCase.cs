@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.Banco;
 
 namespace FinanceControl.Core.Application.UseCases.Banco;
 
-public class BancoUseCase : IBaseUseCase<Domain.Entities.Banco, CreateBancoDto, BancoResponseDto>
+public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, CreateBancoDto, BancoResponseDto>
 {
     private readonly IBancoRepository _repository;
     private readonly IUnitOfWork _unitOfWork;

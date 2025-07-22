@@ -38,7 +38,9 @@ public class TipoTransacaoUseCase : IBaseUseCase<Domain.Entities.TipoTransacao, 
     {
         var TipoTransacao = new Domain.Entities.TipoTransacao
         {
-            Nome = dto.Nome
+            Nome = dto.Nome,
+            DataCadastro = DateTime.UtcNow,
+            DataAlteracao = DateTime.UtcNow
         };
 
         await _repository.AddAsync(TipoTransacao);

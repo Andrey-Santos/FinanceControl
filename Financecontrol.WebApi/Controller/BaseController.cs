@@ -35,7 +35,7 @@ public class BaseController<TEntity, TCreateDto, TResponseDto, TUseCase> : Contr
     public async Task<IActionResult> AddAsync([FromBody] TCreateDto dto)
     {
         await _useCase.AddAsync(dto);
-        return CreatedAtAction(nameof(GetAllAsync), null);
+        return Ok();
     }
 
     [HttpPut("{id:long}")]

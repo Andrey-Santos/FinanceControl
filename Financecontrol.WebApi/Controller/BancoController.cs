@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.UseCases.Banco;
 using FinanceControl.Core.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceControl.WebApi.Controller;
+namespace FinanceControl.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

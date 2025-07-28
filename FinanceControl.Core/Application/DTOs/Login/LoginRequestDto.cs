@@ -1,5 +1,7 @@
+namespace FinanceControl.Core.Application.DTOs.Login;
+
 public class LoginRequestDto
 {
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    public string Nome { get; set; } = string.Empty;
+    public string Senha { get; set; } = string.Empty;
 }

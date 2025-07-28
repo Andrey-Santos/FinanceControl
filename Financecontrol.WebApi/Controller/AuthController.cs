@@ -1,3 +1,4 @@
+using FinanceControl.Core.Application.DTOs.Login;
 using FinanceControl.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,8 +18,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto dto)
     {
-        var usuario = await _usuarioRepository.GetByUsernameAsync(dto.Username);
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Password, usuario.SenhaHash))
+        var usuario = await _usuarioRepository.GetByUsernameAsync(dto.Nome);
+        if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash))
             return Unauthorized("Usuário ou senha inválidos");
 
         var token = _jwtService.GenerateToken(usuario);
@@ -26,7 +27,7 @@ public class AuthController : ControllerBase
         return Ok(new LoginResponseDto
         {
             Token = token,
-            Username = usuario.Nome
+            Nome = usuario.Nome
         });
     }
 }

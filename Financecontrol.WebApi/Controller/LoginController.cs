@@ -25,9 +25,13 @@ public class LoginController : Controller
 
         if (response.IsSuccessStatusCode)
         {
-            var token = await response.Content.ReadAsStringAsync();
-            HttpContext.Response.Cookies.Append("jwt", token);
-            return RedirectToAction("Index", "Home");
+            var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
+
+            if (result != null)
+            {
+                HttpContext.Response.Cookies.Append("jwt", result.Token);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         ViewBag.Erro = "Credenciais inválidas.";

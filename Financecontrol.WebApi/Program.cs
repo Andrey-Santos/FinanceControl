@@ -90,6 +90,11 @@ builder.Services.AddHttpClient();
 // 🧭 MVC e Views
 builder.Services.AddControllersWithViews();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login/Index"; // Caminho da página de login
+});
+
 // 🔓 CORS
 builder.Services.AddCors(options =>
 {
@@ -147,6 +152,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

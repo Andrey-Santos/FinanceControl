@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-namespace FinanceControl.WebApi.Controllers;
+
+namespace FinanceControl.WebApi.Controllers.Web;
 
 [JwtAuthorize]
 public class ConfiguracaoController : Controller

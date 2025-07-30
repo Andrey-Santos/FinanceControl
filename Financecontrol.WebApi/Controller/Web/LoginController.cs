@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FinanceControl.Core.Application.DTOs.Login;
 
-namespace FinanceControl.WebApi.Controllers;
+namespace FinanceControl.WebApi.Controllers.Web;
 
 public class LoginController : Controller
 {

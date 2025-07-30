@@ -1,0 +1,17 @@
+body {
+    background-color: #1D2226;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card-dark {
+    background-color: #2A2F33;
+    border: 1px solid #333;
+    border-radius: 1rem;
+    color: white;
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
+}
+
+.card-dark:hover {
+    background-color: #32383E;
+    transform: translateY(-5px);
+}

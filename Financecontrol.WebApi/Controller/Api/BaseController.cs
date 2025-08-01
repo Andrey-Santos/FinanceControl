@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class BaseController<TEntity, TCreateDto, TResponseDto, TUseCase> : ControllerBase
+public class BaseController<TEntity, TCreateDto, TResponseDto, TUpdateDto, TUseCase> : ControllerBase
                                                                             where TEntity : EntityBase
-                                                                            where TUseCase : IBaseUseCase<TEntity, TCreateDto, TResponseDto>
+                                                                            where TCreateDto : class
+                                                                            where TResponseDto : class
+                                                                            where TUpdateDto : class
+                                                                            where TUseCase : IBaseUseCase<TEntity, TCreateDto, TResponseDto, TUpdateDto>
 {
     protected readonly TUseCase _useCase;
 
@@ -39,9 +42,9 @@ public class BaseController<TEntity, TCreateDto, TResponseDto, TUseCase> : Contr
     }
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> UpdateAsync(long id, [FromBody] TCreateDto dto)
+    public async Task<IActionResult> UpdateAsync([FromBody] TUpdateDto dto)
     {
-        await _useCase.UpdateAsync(id, dto);
+        await _useCase.UpdateAsync(dto);
         return NoContent();
     }
 

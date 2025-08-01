@@ -7,7 +7,7 @@ namespace Financecontrol.WebApi.Controllers.Api;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TipoTransacaoController : BaseController<TipoTransacao, CreateTipoTransacaoDto, TipoTransacaoResponseDto, TipoTransacaoUseCase>
+public class TipoTransacaoController : BaseController<TipoTransacao, TipoTransacaoCreateDto, TipoTransacaoResponseDto, TipoTransacaoUpdateDto, TipoTransacaoUseCase>
 {
     public TipoTransacaoController(TipoTransacaoUseCase useCase) : base(useCase)
     {

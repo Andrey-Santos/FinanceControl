@@ -1,6 +1,6 @@
 namespace FinanceControl.Core.Application.DTOs.TipoTransacao;
 
-public class CreateTipoTransacaoDto
+public class TipoTransacaoCreateDto
 {
     public string Nome { get; set; } = string.Empty;
 }

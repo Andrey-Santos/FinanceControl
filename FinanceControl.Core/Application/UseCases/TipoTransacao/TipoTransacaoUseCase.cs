@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.TipoTransacao;
 
 namespace FinanceControl.Core.Application.UseCases.TipoTransacao;
 
-public class TipoTransacaoUseCase : IBaseUseCase<Domain.Entities.TipoTransacao, CreateTipoTransacaoDto, TipoTransacaoResponseDto>
+public class TipoTransacaoUseCase : IBaseUseCase<Domain.Entities.TipoTransacao, TipoTransacaoCreateDto, TipoTransacaoResponseDto, TipoTransacaoUpdateDto>
 {
     private readonly ITipoTransacaoRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -34,7 +34,7 @@ public class TipoTransacaoUseCase : IBaseUseCase<Domain.Entities.TipoTransacao, 
         };
     }
 
-    public async Task AddAsync(CreateTipoTransacaoDto dto)
+    public async Task AddAsync(TipoTransacaoCreateDto dto)
     {
         var TipoTransacao = new Domain.Entities.TipoTransacao
         {
@@ -47,9 +47,9 @@ public class TipoTransacaoUseCase : IBaseUseCase<Domain.Entities.TipoTransacao, 
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(long id, CreateTipoTransacaoDto dto)
+    public async Task UpdateAsync(TipoTransacaoUpdateDto dto)
     {
-        var TipoTransacao = await _repository.GetByIdAsync(id);
+        var TipoTransacao = await _repository.GetByIdAsync(dto.Id);
         if (TipoTransacao == null)
             return;
 

@@ -1,1 +1,79 @@
-j
+@model IEnumerable<FinanceControl.Core.Application.DTOs.TipoTransacao.TipoTransacaoResponseDto>
+
+@{
+    ViewData["Title"] = "Tipos de Transação";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Tipos de Transação</h2>
+
+    <div class="d-flex gap-2 mb-3">
+        <a asp-action="Create" class="btn btn-success">Adicionar</a>
+        <a id="btnEditar" class="btn btn-primary disabled">Editar</a>
+        <button id="btnExcluir" class="btn btn-danger disabled">Excluir</button>
+    </div>
+
+    <table class="table table-dark table-striped table-hover rounded shadow-sm" id="tabelaTipos">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tipo in Model)
+            {
+                <tr data-id="@tipo.Id" style="cursor: pointer;">
+                    <td>@tipo.Id</td>
+                    <td>@tipo.Nome</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<form asp-action="Delete" method="post" id="tokenForm" style="display:none">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    
+    <script>
+        let tipoSelecionadoId = null;
+
+        document.querySelectorAll("#tabelaTipos tbody tr").forEach(row => {
+            row.addEventListener("click", () => {
+                // Remove seleção anterior
+                document.querySelectorAll("#tabelaTipos tbody tr").forEach(r => r.classList.remove("table-active"));
+
+                // Adiciona seleção
+                row.classList.add("table-active");
+                tipoSelecionadoId = row.getAttribute("data-id");
+
+                // Habilita botões
+                document.getElementById("btnEditar").classList.remove("disabled");
+                document.getElementById("btnExcluir").classList.remove("disabled");
+            });
+        });
+
+        document.getElementById("btnEditar").addEventListener("click", function () {
+            if (tipoSelecionadoId) {
+                window.location.href = `/TipoTransacao/Edit/${tipoSelecionadoId}`;
+            }
+        });
+
+        document.getElementById("btnExcluir").addEventListener("click", function () {
+            if (tipoSelecionadoId && confirm("Tem certeza que deseja excluir este tipo de transação?")) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = `/TipoTransacao/Delete/${tipoSelecionadoId}`;
+
+                const antiForgeryInput = document.querySelector('input[name="__RequestVerificationToken"]')?.cloneNode();
+                if (antiForgeryInput) form.appendChild(antiForgeryInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    </script>
+}

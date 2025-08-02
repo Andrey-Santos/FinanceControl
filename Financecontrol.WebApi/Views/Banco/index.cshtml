@@ -1,11 +1,11 @@
-@model IEnumerable<FinanceControl.Core.Application.DTOs.TipoTransacao.TipoTransacaoResponseDto>
+@model IEnumerable<FinanceControl.Core.Application.DTOs.Banco.BancoResponseDto>
 
 @{
-    ViewData["Title"] = "Tipos de Transação";
+    ViewData["Title"] = "Bancos";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">@ViewData["Title"]o</h2>
+    <h2 class="mb-4">@ViewData["Title"]</h2>
 
     <div class="d-flex gap-2 mb-3">
         <a asp-action="Create" class="btn btn-success">Adicionar</a>
@@ -13,7 +13,7 @@
         <button id="btnExcluir" class="btn btn-danger disabled">Excluir</button>
     </div>
 
-    <table class="table table-dark table-striped table-hover rounded shadow-sm" id="tabelaTipos">
+    <table class="table table-dark table-striped table-hover rounded shadow-sm" id="tabelaBancos">
         <thead>
             <tr>
                 <th>ID</th>
@@ -21,11 +21,11 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var tipo in Model)
+            @foreach (var banco in Model)
             {
-                <tr data-id="@tipo.Id" style="cursor: pointer;">
-                    <td>@tipo.Id</td>
-                    <td>@tipo.Nome</td>
+                <tr data-id="@banco.Id" style="cursor: pointer;">
+                    <td>@banco.Id</td>
+                    <td>@banco.Nome</td>
                 </tr>
             }
         </tbody>
@@ -37,14 +37,13 @@
 </form>
 
 @section Scripts {
-    
     <script>
         let tipoSelecionadoId = null;
 
-        document.querySelectorAll("#tabelaTipos tbody tr").forEach(row => {
+        document.querySelectorAll("#tabelaBancos tbody tr").forEach(row => {
             row.addEventListener("click", () => {
                 // Remove seleção anterior
-                document.querySelectorAll("#tabelaTipos tbody tr").forEach(r => r.classList.remove("table-active"));
+                document.querySelectorAll("#tabelaBancos tbody tr").forEach(r => r.classList.remove("table-active"));
 
                 // Adiciona seleção
                 row.classList.add("table-active");
@@ -58,15 +57,15 @@
 
         document.getElementById("btnEditar").addEventListener("click", function () {
             if (tipoSelecionadoId) {
-                window.location.href = `/TipoTransacao/Edit/${tipoSelecionadoId}`;
+                window.location.href = `/Banco/Edit/${tipoSelecionadoId}`;
             }
         });
 
         document.getElementById("btnExcluir").addEventListener("click", function () {
-            if (tipoSelecionadoId && confirm("Tem certeza que deseja excluir este tipo de transação?")) {
+            if (tipoSelecionadoId && confirm("Tem certeza que deseja excluir este banco?")) {
                 const form = document.createElement('form');
                 form.method = 'post';
-                form.action = `/TipoTransacao/Delete/${tipoSelecionadoId}`;
+                form.action = `/Banco/Delete/${tipoSelecionadoId}`;
 
                 const antiForgeryInput = document.querySelector('input[name="__RequestVerificationToken"]')?.cloneNode();
                 if (antiForgeryInput) form.appendChild(antiForgeryInput);

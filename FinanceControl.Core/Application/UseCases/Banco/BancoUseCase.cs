@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.Banco;
 
 namespace FinanceControl.Core.Application.UseCases.Banco;
 
-public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, CreateBancoDto, BancoResponseDto>
+public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, BancoCreateDto, BancoResponseDto, BancoUpdateDto>
 {
     private readonly IBancoRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -34,7 +34,7 @@ public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, Cre
         };
     }
 
-    public async Task AddAsync(CreateBancoDto dto)
+    public async Task AddAsync(BancoCreateDto dto)
     {
         var Banco = new Domain.Entities.Banco
         {
@@ -45,9 +45,9 @@ public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, Cre
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(long id, CreateBancoDto dto)
+    public async Task UpdateAsync(BancoUpdateDto dto)
     {
-        var Banco = await _repository.GetByIdAsync(id);
+        var Banco = await _repository.GetByIdAsync(dto.Id);
         if (Banco == null)
             return;
 

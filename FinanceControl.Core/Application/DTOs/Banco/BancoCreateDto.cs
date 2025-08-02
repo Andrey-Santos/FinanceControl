@@ -1,6 +1,6 @@
 namespace FinanceControl.Core.Application.DTOs.Banco;
 
-public class CreateBancoDto
+public class BancoCreateDto
 {
     public string Nome { get; set; } = string.Empty;
 }

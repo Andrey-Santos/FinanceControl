@@ -7,7 +7,7 @@ namespace FinanceControl.WebApi.Controllers.Api;
 
 [ApiController]
 [Route("api/[controller]")]
-public class FaturaController : BaseController<Fatura, CreateFaturaDto, FaturaResponseDto, FaturaUseCase>
+public class FaturaController : BaseController<Fatura, CreateFaturaDto, FaturaResponseDto, FaturaResponseDto, FaturaUseCase>
 {
     public FaturaController(FaturaUseCase useCase) : base(useCase)
     {

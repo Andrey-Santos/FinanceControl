@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.Cartao;
 
 namespace FinanceControl.Core.Application.UseCases.Cartao;
 
-public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDto, CartaoResponseDto>
+public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDto, CartaoResponseDto, CartaoResponseDto>
 {
     private readonly ICartaoRepository _repository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
@@ -63,11 +63,11 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(long id, CreateCartaoDto dto)
+    public async Task UpdateAsync(CartaoResponseDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
         
-        var Cartao = await _repository.GetByIdAsync(id);
+        var Cartao = await _repository.GetByIdAsync(dto.Id);
         if (Cartao == null)
             return;
 

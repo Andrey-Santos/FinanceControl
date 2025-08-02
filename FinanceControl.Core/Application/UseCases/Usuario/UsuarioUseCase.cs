@@ -4,7 +4,7 @@ using BCrypt.Net;
 
 namespace FinanceControl.Core.Application.UseCases.Usuario;
 
-public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuarioDto, UsuarioResponseDto>
+public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuarioDto, UsuarioResponseDto, UsuarioResponseDto>
 {
     private readonly IUsuarioRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -49,9 +49,9 @@ public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuari
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(long id, CreateUsuarioDto dto)
+    public async Task UpdateAsync(UsuarioResponseDto dto)
     {
-        var usuario = await _repository.GetByIdAsync(id);
+        var usuario = await _repository.GetByIdAsync(dto.Id);
         if (usuario == null)
             return;
 

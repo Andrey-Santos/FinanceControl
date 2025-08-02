@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.Fatura;
 
 namespace FinanceControl.Core.Application.UseCases.Fatura;
 
-public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, CreateFaturaDto, FaturaResponseDto>
+public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, CreateFaturaDto, FaturaResponseDto, FaturaResponseDto>
 {
     private readonly IFaturaRepository _repository;
     private readonly ICartaoRepository _cartaoRepository;
@@ -57,11 +57,11 @@ public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, C
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(long id, CreateFaturaDto dto)
+    public async Task UpdateAsync(FaturaResponseDto dto)
     {
         await ValidarEntidadeExistenteAsync(_cartaoRepository, dto.CartaoId, "Cartão");
 
-        var Fatura = await _repository.GetByIdAsync(id);
+        var Fatura = await _repository.GetByIdAsync(dto.Id);
         if (Fatura == null)
             return;
 

@@ -7,7 +7,7 @@ namespace Financecontrol.WebApi.Controllers.Api;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsuarioController : BaseController<Usuario, CreateUsuarioDto, UsuarioResponseDto, UsuarioUseCase>
+public class UsuarioController : BaseController<Usuario, CreateUsuarioDto, UsuarioResponseDto, UsuarioResponseDto, UsuarioUseCase>
 {
     public UsuarioController(UsuarioUseCase useCase) : base(useCase)
     {

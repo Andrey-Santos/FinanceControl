@@ -1,6 +1,6 @@
 namespace FinanceControl.Core.Application.DTOs.ContaBancaria;
 
-public class CreateContaBancariaDto
+public class ContaBancariaCreateDto
 {
     public long UsuarioId { get; set; }
     public string Numero { get; set; } = string.Empty;

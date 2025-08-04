@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.ContaBancaria;
 
 namespace FinanceControl.Core.Application.UseCases.ContaBancaria;
 
-public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.ContaBancaria, CreateContaBancariaDto, ContaBancariaResponseDto, ContaBancariaResponseDto>
+public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.ContaBancaria, ContaBancariaCreateDto, ContaBancariaResponseDto, ContaBancariaResponseDto>
 {
     private readonly IContaBancariaRepository _repository;
     private readonly IBancoRepository _bancoRepository;
@@ -42,7 +42,7 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
         };
     }
 
-    public async Task AddAsync(CreateContaBancariaDto dto)
+    public async Task AddAsync(ContaBancariaCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_usuarioRepository, dto.UsuarioId, "Usuário");
         await ValidarEntidadeExistenteAsync(_bancoRepository, dto.BancoId, "Banco");

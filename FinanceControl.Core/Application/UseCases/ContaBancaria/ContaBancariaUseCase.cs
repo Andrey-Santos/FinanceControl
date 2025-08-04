@@ -1,9 +1,10 @@
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.ContaBancaria;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceControl.Core.Application.UseCases.ContaBancaria;
 
-public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.ContaBancaria, ContaBancariaCreateDto, ContaBancariaResponseDto, ContaBancariaResponseDto>
+public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.ContaBancaria, ContaBancariaCreateDto, ContaBancariaResponseDto, ContaBancariaUpdateDto>
 {
     private readonly IContaBancariaRepository _repository;
     private readonly IBancoRepository _bancoRepository;
@@ -20,25 +21,30 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
 
     public async Task<IEnumerable<ContaBancariaResponseDto>> GetAllAsync()
     {
-        var ContaBancarias = await _repository.GetAllAsync();
-        return ContaBancarias.Select(u => new ContaBancariaResponseDto
+        var contas = await _repository
+            .GetAll()
+            .Include(c => c.Banco)
+            .ToListAsync();
+
+        return contas.Select(c => new ContaBancariaResponseDto
         {
-            Id = u.Id,
-            Numero = u.Numero,
-            UsuarioId = u.UsuarioId,
-            BancoId = u.BancoId
+            Id = c.Id,
+            Numero = c.Numero,
+            BancoId = c.BancoId,
+            UsuarioId = c.UsuarioId,
+            BancoNome = c.Banco.Nome,
         });
     }
 
     public async Task<ContaBancariaResponseDto?> GetByIdAsync(long id)
     {
-        var ContaBancaria = await _repository.GetByIdAsync(id);
-        return ContaBancaria is null ? null : new ContaBancariaResponseDto
+        var contas = await _repository.GetByIdAsync(id);
+        return contas is null ? null : new ContaBancariaResponseDto
         {
-            Id = ContaBancaria.Id,
-            Numero = ContaBancaria.Numero,
-            UsuarioId = ContaBancaria.UsuarioId,
-            BancoId = ContaBancaria.BancoId
+            Id = contas.Id,
+            Numero = contas.Numero,
+            UsuarioId = contas.UsuarioId,
+            BancoId = contas.BancoId
         };
     }
 
@@ -47,7 +53,7 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
         await ValidarEntidadeExistenteAsync(_usuarioRepository, dto.UsuarioId, "Usuário");
         await ValidarEntidadeExistenteAsync(_bancoRepository, dto.BancoId, "Banco");
 
-        var ContaBancaria = new Domain.Entities.ContaBancaria
+        var contas = new Domain.Entities.ContaBancaria
         {
             Numero = dto.Numero,
             UsuarioId = dto.UsuarioId,
@@ -56,25 +62,25 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
             DataAlteracao = DateTime.UtcNow
         };
 
-        await _repository.AddAsync(ContaBancaria);
+        await _repository.AddAsync(contas);
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(ContaBancariaResponseDto dto)
+    public async Task UpdateAsync(ContaBancariaUpdateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_usuarioRepository, dto.UsuarioId, "Usuário");
         await ValidarEntidadeExistenteAsync(_bancoRepository, dto.BancoId, "Banco");
         
-        var ContaBancaria = await _repository.GetByIdAsync(dto.Id);
-        if (ContaBancaria == null)
+        var contas = await _repository.GetByIdAsync(dto.Id);
+        if (contas == null)
             return;
 
-        ContaBancaria.DataAlteracao = DateTime.UtcNow;
-        ContaBancaria.Numero = dto.Numero;
-        ContaBancaria.UsuarioId = dto.UsuarioId;
-        ContaBancaria.BancoId = dto.BancoId;
+        contas.DataAlteracao = DateTime.UtcNow;
+        contas.Numero = dto.Numero;
+        contas.UsuarioId = dto.UsuarioId;
+        contas.BancoId = dto.BancoId;
 
-        await _repository.UpdateAsync(ContaBancaria);
+        await _repository.UpdateAsync(contas);
         await _unitOfWork.CommitAsync();
     }
 

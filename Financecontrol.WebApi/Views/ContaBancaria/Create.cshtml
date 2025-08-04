@@ -1,0 +1,39 @@
+@model FinanceControl.Core.Application.DTOs.ContaBancaria.ContaBancariaCreateDto
+
+@{
+    ViewData["Title"] = "Conta Bancária";
+}
+
+<div class="mt-5 row justify-content-center">
+    <div class="card bg-dark text-white shadow col-md-6">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Criar</h4>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Numero" class="form-label"></label>
+                    <input asp-for="Numero" class="form-control" />
+                    <span asp-validation-for="Numero" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BancoId" class="form-label">Banco</label>
+                    <select asp-for="BancoId" asp-items="ViewBag.Bancos" class="form-select">
+                        <option value="">Selecione um banco</option>
+                    </select>
+                    <span asp-validation-for="BancoId" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -40,13 +40,13 @@ public class TipoTransacaoController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(long id)
     {
-        var tipo = await _useCase.GetByIdAsync(id);
-        if (tipo == null)
+        var entity = await _useCase.GetByIdAsync(id);
+        if (entity == null)
             return NotFound();
 
         var dto = new TipoTransacaoUpdateDto
         {
-            Nome = tipo.Nome
+            Nome = entity.Nome
         };
 
         return View(dto);

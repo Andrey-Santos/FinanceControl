@@ -4,5 +4,5 @@ namespace FinanceControl.Core.Domain.Interfaces;
 
 public interface IContaBancariaRepository : IBaseRepository<ContaBancaria>
 {
+    IQueryable<ContaBancaria> GetAll();
 }
-

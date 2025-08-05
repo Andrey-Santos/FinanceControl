@@ -2,9 +2,8 @@ using FinanceControl.Core.Domain.Enums;
 
 namespace FinanceControl.Core.Application.DTOs.Cartao;
 
-public class CartaoResponseDto
+public class CartaoCreateDto
 {
-    public long Id { get; set; }
     public string Apelido { get; set; } = string.Empty;
     public long ContaBancariaId { get; set; }
     public int DiaFechamento { get; set; }

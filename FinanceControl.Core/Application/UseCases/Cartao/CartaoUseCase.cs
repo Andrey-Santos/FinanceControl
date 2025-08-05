@@ -3,7 +3,7 @@ using FinanceControl.Core.Application.DTOs.Cartao;
 
 namespace FinanceControl.Core.Application.UseCases.Cartao;
 
-public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, CreateCartaoDto, CartaoResponseDto, CartaoResponseDto>
+public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, CartaoCreateDto, CartaoResponseDto, CartaoUpdateDto>
 {
     private readonly ICartaoRepository _repository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
@@ -25,7 +25,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
             Apelido = u.Apelido,
             ContaBancariaId = u.ContaBancariaId,
             DiaFechamento = u.DiaFechamento,
-            Tipo = u.Tipo,
+            Tipo = (Domain.Enums.TipoCartao)u.Tipo,
             Limite = u.Limite
         });
     }
@@ -39,12 +39,12 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
             Apelido = Cartao.Apelido,
             ContaBancariaId = Cartao.ContaBancariaId,
             DiaFechamento = Cartao.DiaFechamento,
-            Tipo = Cartao.Tipo,
+            Tipo = (Domain.Enums.TipoCartao)Cartao.Tipo,
             Limite = Cartao.Limite
         };
     }
 
-    public async Task AddAsync(CreateCartaoDto dto)
+    public async Task AddAsync(CartaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
 
@@ -53,7 +53,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
             Apelido = dto.Apelido,
             ContaBancariaId = dto.ContaBancariaId,
             DiaFechamento = dto.DiaFechamento,
-            Tipo = dto.Tipo,
+            Tipo = (long)dto.Tipo,
             Limite = dto.Limite,
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
@@ -63,7 +63,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(CartaoResponseDto dto)
+    public async Task UpdateAsync(CartaoUpdateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
         
@@ -75,7 +75,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
         Cartao.Apelido = dto.Apelido;
         Cartao.ContaBancariaId = dto.ContaBancariaId;
         Cartao.DiaFechamento = dto.DiaFechamento;
-        Cartao.Tipo = dto.Tipo;
+        Cartao.Tipo = (long)dto.Tipo;
         Cartao.Limite = dto.Limite;
 
         await _repository.UpdateAsync(Cartao);

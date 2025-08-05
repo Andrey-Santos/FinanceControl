@@ -7,7 +7,7 @@ namespace FinanceControl.WebApi.Controllers.Api;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CartaoController : BaseController<Cartao, CreateCartaoDto, CartaoResponseDto, CartaoResponseDto, CartaoUseCase>
+public class CartaoController : BaseController<Cartao, CartaoCreateDto, CartaoResponseDto, CartaoUpdateDto, CartaoUseCase>
 {
     public CartaoController(CartaoUseCase useCase) : base(useCase)
     {

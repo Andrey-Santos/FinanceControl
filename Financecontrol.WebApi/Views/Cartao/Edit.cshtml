@@ -1,0 +1,53 @@
+@model FinanceControl.Core.Application.DTOs.Cartao.CartaoUpdateDto
+
+@{
+    ViewData["Title"] = "Cartão - Editar";
+}
+
+<div class="mt-5 row justify-content-center">
+    <div class="card bg-dark text-white shadow col-md-6">
+        <div class="card-body">
+            <h4 class="card-title mb-4">@ViewData["Title"]</h4>
+
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Apelido" class="form-label"></label>
+                    <input asp-for="Apelido" class="form-control" />
+                    <span asp-validation-for="Apelido" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ContaBancariaId" class="form-label"></label>
+                    <select asp-for="ContaBancariaId" class="form-select" asp-items="ViewBag.Contas">
+                        <option value="">Selecione a conta</option>
+                    </select>
+                    <span asp-validation-for="ContaBancariaId" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DiaFechamento" class="form-label"></label>
+                    <input asp-for="DiaFechamento" class="form-control" type="number" min="1" max="31" />
+                    <span asp-validation-for="DiaFechamento" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Tipo" class="form-label"></label>
+                    <select asp-for="Tipo" class="form-select" asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoCartao>()"></select>
+                    <span asp-validation-for="Tipo" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Limite" class="form-label"></label>
+                    <input asp-for="Limite" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="Limite" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

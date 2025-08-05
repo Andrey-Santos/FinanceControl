@@ -1,0 +1,82 @@
+@model IEnumerable<FinanceControl.Core.Application.DTOs.Cartao.CartaoResponseDto>
+
+@{
+    ViewData["Title"] = "Cartões";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <div class="d-flex gap-2 mb-3">
+        <a asp-action="Create" class="btn btn-success">Adicionar</a>
+        <a id="btnEditar" class="btn btn-primary disabled">Editar</a>
+        <button id="btnExcluir" class="btn btn-danger disabled">Excluir</button>
+    </div>
+
+    <table class="table table-dark table-striped table-hover rounded shadow-sm" id="tabelaContas">
+        <thead>
+            <tr>
+            <th>Apelido</th>
+            <th>Conta Bancária</th>
+            <th>Dia Fechamento</th>
+            <th>Tipo</th>
+            <th>Limite</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cartao in Model)
+            {
+                <tr data-id="@cartao.Id" style="cursor:pointer;">
+                    <td>@cartao.Apelido</td>
+                    <td>@cartao.ContaBancariaId</td>
+                    <td>@cartao.DiaFechamento</td>
+                    <td>@cartao.Tipo</td>
+                    <td>@cartao.Limite</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <form id="antiForgeryForm" style="display:none">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <script>
+        let contaSelecionadaId = null;
+
+        document.querySelectorAll("#tabelaContas tbody tr").forEach(row => {
+            row.addEventListener("click", () => {
+                document.querySelectorAll("#tabelaContas tbody tr").forEach(r => r.classList.remove("table-active"));
+                row.classList.add("table-active");
+                contaSelecionadaId = row.getAttribute("data-id");
+
+                document.getElementById("btnEditar").classList.remove("disabled");
+                document.getElementById("btnExcluir").classList.remove("disabled");
+            });
+        });
+
+        document.getElementById("btnEditar").addEventListener("click", () => {
+            if (contaSelecionadaId) {
+                window.location.href = `/Cartao/Edit/${contaSelecionadaId}`;
+            }
+        });
+
+        document.getElementById("btnExcluir").addEventListener("click", async () => {
+            if (!contaSelecionadaId || !confirm("Deseja excluir esta conta?")) return;
+
+            const token = document.querySelector("#antiForgeryForm input[name='__RequestVerificationToken']").value;
+
+            const response = await fetch(`/Cartao/Delete/${contaSelecionadaId}`, {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            });
+
+            if (response.ok) 
+                location.reload();
+            else 
+                alert("Erro ao excluir.");
+        });
+    </script>
+}

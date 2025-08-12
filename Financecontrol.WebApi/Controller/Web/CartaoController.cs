@@ -3,10 +3,7 @@ using FinanceControl.Core.Application.UseCases.Cartao;
 using FinanceControl.Core.Application.DTOs.Cartao;
 using FinanceControl.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
 using FinanceControl.Core.Domain.Enums;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
 namespace Financecontrol.WebApi.Controllers.Web;
 

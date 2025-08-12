@@ -7,4 +7,9 @@ namespace FinanceControl.Infrastructure.Repositories;
 public class TransacaoRepository : BaseRepository<Transacao>, ITransacaoRepository
 {
     public TransacaoRepository(FinanceDbContext context) : base(context) { }
+
+    public IQueryable<Transacao> GetAll()
+    {
+        return _context.Transacoes.AsQueryable();
+    }
 }

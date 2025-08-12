@@ -4,4 +4,5 @@ namespace FinanceControl.Core.Domain.Interfaces;
 
 public interface ITransacaoRepository : IBaseRepository<Transacao>
 {
+    IQueryable<Transacao> GetAll();
 }

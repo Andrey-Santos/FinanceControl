@@ -7,4 +7,7 @@ public class TransacaoResponseDto : DtoResponse
     public DateTime DataEfetivacao { get; set; }
     public long ContaBancariaId { get; set; }
     public long TipoId { get; set; }
+
+    public string ContaBancariaNumero { get; set; } = string.Empty;
+    public string TipoNome { get; set; } = string.Empty;
 }

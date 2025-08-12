@@ -1,9 +1,10 @@
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.Transacao;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceControl.Core.Application.UseCases.Transacao;
 
-public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transacao, CreateTransacaoDto, TransacaoResponseDto, TransacaoResponseDto>
+public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transacao, TransacaoCreateDto, TransacaoResponseDto, TransacaoUpdateDto>
 {
     private readonly ITransacaoRepository _repository;
     private readonly ITipoTransacaoRepository _tipoTransacaoRepository;
@@ -20,7 +21,12 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
     public async Task<IEnumerable<TransacaoResponseDto>> GetAllAsync()
     {
-        var Transacaos = await _repository.GetAllAsync();
+        var Transacaos = await _repository
+                                .GetAll()
+                                .Include(t => t.ContaBancaria)
+                                .Include(t => t.Tipo)
+                                .ToListAsync();
+
         return Transacaos.Select(u => new TransacaoResponseDto
         {
             Id = u.Id,
@@ -28,7 +34,9 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             Valor = u.Valor,
             DataEfetivacao = u.DataEfetivacao,
             ContaBancariaId = u.ContaBancariaId,
-            TipoId = u.TipoId
+            TipoId = u.TipoId,
+            ContaBancariaNumero = u.ContaBancaria.Numero,
+            TipoNome = u.Tipo.Nome
         });
     }
 
@@ -46,7 +54,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         };
     }
 
-    public async Task AddAsync(CreateTransacaoDto dto)
+    public async Task AddAsync(TransacaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
         await ValidarEntidadeExistenteAsync(_tipoTransacaoRepository, dto.TipoId, "Tipo de transação");
@@ -66,7 +74,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task UpdateAsync(TransacaoResponseDto dto)
+    public async Task UpdateAsync(TransacaoUpdateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
         await ValidarEntidadeExistenteAsync(_tipoTransacaoRepository, dto.TipoId, "Tipo de transação");

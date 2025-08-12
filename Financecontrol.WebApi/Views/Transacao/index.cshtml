@@ -20,6 +20,7 @@
                 <th>Descrição</th>
                 <th>Valor</th>
                 <th>Data</th>
+                <th>Tipo</th>
                 <th>Conta</th>
                 <th>Categoria</th>
             </tr>
@@ -32,6 +33,7 @@
                     <td>@t.Descricao</td>
                     <td>@t.Valor.ToString("C")</td>
                     <td>@t.DataEfetivacao.ToShortDateString()</td>
+                    <td>@t.Tipo</td>
                     <td>@t.ContaBancariaNumero</td> 
                     <td>@t.CategoriaNome</td>
                 </tr>
@@ -68,7 +70,7 @@
         });
 
         document.getElementById("btnExcluir").addEventListener("click", function () {
-            if (transacaoSelecionadaId && confirm("Tem certeza que deseja excluir este tipo de transação?")) {
+            if (transacaoSelecionadaId && confirm("Tem certeza que deseja excluir esta transação?")) {
                 const form = document.createElement('form');
                 form.method = 'post';
                 form.action = `/Transacao/Delete/${transacaoSelecionadaId}`;

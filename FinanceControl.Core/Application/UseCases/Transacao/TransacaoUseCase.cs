@@ -13,10 +13,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
     public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
     {
+        _unitOfWork = unitOfWork;
         _repository = repository;
         _categoriaTransacaoRepository = categoriaRepository;
         _contaBancariaRepository = contaBancariaRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<TransacaoResponseDto>> GetAllAsync()
@@ -36,7 +36,8 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             ContaBancariaId = u.ContaBancariaId,
             CategoriaId = u.CategoriaId,
             ContaBancariaNumero = u.ContaBancaria.Numero,
-            CategoriaNome = u.Categoria.Nome
+            CategoriaNome = u.Categoria.Nome,
+            Tipo = u.Tipo
         });
     }
 
@@ -50,7 +51,8 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             Valor = Transacao.Valor,
             DataEfetivacao = Transacao.DataEfetivacao,
             ContaBancariaId = Transacao.ContaBancariaId,
-            CategoriaId = Transacao.CategoriaId
+            CategoriaId = Transacao.CategoriaId,
+            Tipo = Transacao.Tipo
         };
     }
 
@@ -66,6 +68,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             Valor = dto.Valor,
             ContaBancariaId = dto.ContaBancariaId,
             CategoriaId = dto.CategoriaId,
+            Tipo = dto.Tipo,
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
         };
@@ -89,6 +92,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         Transacao.Valor = dto.Valor;
         Transacao.ContaBancariaId = dto.ContaBancariaId;
         Transacao.CategoriaId = dto.CategoriaId;
+        Transacao.Tipo = dto.Tipo;
 
         await _repository.UpdateAsync(Transacao);
         await _unitOfWork.CommitAsync();

@@ -11,9 +11,9 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
 
     public CartaoUseCase(ICartaoRepository repository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
     {
+        _unitOfWork = unitOfWork;
         _repository = repository;
         _contaBancariaRepository = contaBancariaRepository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<CartaoResponseDto>> GetAllAsync()
@@ -25,7 +25,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
             Apelido = u.Apelido,
             ContaBancariaId = u.ContaBancariaId,
             DiaFechamento = u.DiaFechamento,
-            Tipo = (Domain.Enums.TipoCartao)u.Tipo,
+            Tipo = u.Tipo,
             Limite = u.Limite
         });
     }
@@ -39,7 +39,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
             Apelido = Cartao.Apelido,
             ContaBancariaId = Cartao.ContaBancariaId,
             DiaFechamento = Cartao.DiaFechamento,
-            Tipo = (Domain.Enums.TipoCartao)Cartao.Tipo,
+            Tipo = Cartao.Tipo,
             Limite = Cartao.Limite
         };
     }
@@ -53,7 +53,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
             Apelido = dto.Apelido,
             ContaBancariaId = dto.ContaBancariaId,
             DiaFechamento = dto.DiaFechamento,
-            Tipo = (long)dto.Tipo,
+            Tipo = dto.Tipo,
             Limite = dto.Limite,
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
@@ -75,7 +75,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
         Cartao.Apelido = dto.Apelido;
         Cartao.ContaBancariaId = dto.ContaBancariaId;
         Cartao.DiaFechamento = dto.DiaFechamento;
-        Cartao.Tipo = (long)dto.Tipo;
+        Cartao.Tipo = dto.Tipo;
         Cartao.Limite = dto.Limite;
 
         await _repository.UpdateAsync(Cartao);

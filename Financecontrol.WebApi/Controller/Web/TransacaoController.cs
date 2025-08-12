@@ -3,6 +3,7 @@ using FinanceControl.Core.Application.UseCases.Transacao;
 using FinanceControl.Core.Application.DTOs.Transacao;
 using FinanceControl.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using FinanceControl.Core.Domain.Enums;
 
 namespace Financecontrol.WebApi.Controllers.Web;
 
@@ -20,11 +21,12 @@ public class TransacaoController : Controller
         _categoriaTransacaoRepository = categoriaTransacaoRepository;
     }
 
-    public async Task Load()
+    public async Task LoadLists()
     {
         var contas = await _contaBancariaRepository.GetAllAsync();
         var categorias = await _categoriaTransacaoRepository.GetAllAsync();
 
+        ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoTransacao)));
         ViewBag.Categorias = new SelectList(categorias, "Id", "Nome");
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
     }
@@ -38,7 +40,7 @@ public class TransacaoController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await Load();
+        await LoadLists();
 
         var model = new TransacaoCreateDto
         {
@@ -54,7 +56,7 @@ public class TransacaoController : Controller
     {
         if (!ModelState.IsValid)
         {
-            await Load();
+            await LoadLists();
             return View(dto);
         }
 
@@ -69,7 +71,7 @@ public class TransacaoController : Controller
         if (entity == null)
             return NotFound();
 
-        await Load();
+        await LoadLists();
 
         var dto = new TransacaoUpdateDto
         {
@@ -78,7 +80,8 @@ public class TransacaoController : Controller
             DataEfetivacao = entity.DataEfetivacao,
             Valor = entity.Valor,
             ContaBancariaId = entity.ContaBancariaId,
-            CategoriaId = entity.CategoriaId
+            CategoriaId = entity.CategoriaId,
+            Tipo = entity.Tipo
         };
 
         return View(dto);
@@ -90,7 +93,7 @@ public class TransacaoController : Controller
     {
         if (!ModelState.IsValid)
         {
-            await Load();
+            await LoadLists();
             return View(dto);
         }
 

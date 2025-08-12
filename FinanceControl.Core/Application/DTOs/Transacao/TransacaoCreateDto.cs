@@ -6,5 +6,5 @@ public class TransacaoCreateDto
     public double Valor { get; set; }
     public DateTime DataEfetivacao { get; set; }
     public long ContaBancariaId { get; set; }
-    public long TipoId { get; set; }
+    public long CategoriaId { get; set; }
 }

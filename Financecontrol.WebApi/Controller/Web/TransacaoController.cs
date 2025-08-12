@@ -11,21 +11,21 @@ public class TransacaoController : Controller
     private readonly TransacaoUseCase _useCase;
 
     private readonly IContaBancariaRepository _contaBancariaRepository;
-    private readonly ITipoTransacaoRepository _tipoTransacaoRepository;
+    private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
 
-    public TransacaoController(TransacaoUseCase useCase, IContaBancariaRepository contaBancariaRepository, ITipoTransacaoRepository tipoTransacaoRepository)
+    public TransacaoController(TransacaoUseCase useCase, IContaBancariaRepository contaBancariaRepository, ICategoriaTransacaoRepository categoriaTransacaoRepository)
     {
         _useCase = useCase;
         _contaBancariaRepository = contaBancariaRepository;
-        _tipoTransacaoRepository = tipoTransacaoRepository;
+        _categoriaTransacaoRepository = categoriaTransacaoRepository;
     }
 
     public async Task Load()
     {
         var contas = await _contaBancariaRepository.GetAllAsync();
-        var tipos = await _tipoTransacaoRepository.GetAllAsync();
+        var categorias = await _categoriaTransacaoRepository.GetAllAsync();
 
-        ViewBag.Tipos = new SelectList(tipos, "Id", "Nome");
+        ViewBag.Categorias = new SelectList(categorias, "Id", "Nome");
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
     }
 
@@ -78,7 +78,7 @@ public class TransacaoController : Controller
             DataEfetivacao = entity.DataEfetivacao,
             Valor = entity.Valor,
             ContaBancariaId = entity.ContaBancariaId,
-            TipoId = entity.TipoId
+            CategoriaId = entity.CategoriaId
         };
 
         return View(dto);

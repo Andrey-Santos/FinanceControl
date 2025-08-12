@@ -6,8 +6,8 @@ public class Transacao : EntityBase
     public double Valor { get; set; }
     public DateTime DataEfetivacao { get; set; }
     public long ContaBancariaId { get; set; }
-    public long TipoId { get; set; }
+    public long CategoriaId { get; set; }
 
     public ContaBancaria ContaBancaria { get; set; } = null!;
-    public TipoTransacao Tipo { get; set; } = null!;
+    public CategoriaTransacao Categoria { get; set; } = null!;
 }

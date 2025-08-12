@@ -1,7 +1,7 @@
-@model IEnumerable<FinanceControl.Core.Application.DTOs.TipoTransacao.TipoTransacaoResponseDto>
+@model IEnumerable<FinanceControl.Core.Application.DTOs.CategoriaTransacao.CategoriaTransacaoResponseDto>
 
 @{
-    ViewData["Title"] = "Tipos de Transação";
+    ViewData["Title"] = "Categoria de Transação";
 }
 
 <div class="container mt-4">
@@ -58,7 +58,7 @@
 
         document.getElementById("btnEditar").addEventListener("click", function () {
             if (tipoSelecionadoId) {
-                window.location.href = `/TipoTransacao/Edit/${tipoSelecionadoId}`;
+                window.location.href = `/CategoriaTransacao/Edit/${tipoSelecionadoId}`;
             }
         });
 
@@ -66,7 +66,7 @@
             if (tipoSelecionadoId && confirm("Tem certeza que deseja excluir este tipo de transação?")) {
                 const form = document.createElement('form');
                 form.method = 'post';
-                form.action = `/TipoTransacao/Delete/${tipoSelecionadoId}`;
+                form.action = `/CategoriaTransacao/Delete/${tipoSelecionadoId}`;
 
                 const antiForgeryInput = document.querySelector('input[name="__RequestVerificationToken"]')?.cloneNode();
                 if (antiForgeryInput) form.appendChild(antiForgeryInput);

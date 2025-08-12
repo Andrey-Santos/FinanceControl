@@ -6,8 +6,8 @@ public class TransacaoResponseDto : DtoResponse
     public double Valor { get; set; }
     public DateTime DataEfetivacao { get; set; }
     public long ContaBancariaId { get; set; }
-    public long TipoId { get; set; }
+    public long CategoriaId { get; set; }
 
     public string ContaBancariaNumero { get; set; } = string.Empty;
-    public string TipoNome { get; set; } = string.Empty;
+    public string CategoriaNome { get; set; } = string.Empty;
 }

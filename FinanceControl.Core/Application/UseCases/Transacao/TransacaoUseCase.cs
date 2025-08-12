@@ -7,14 +7,14 @@ namespace FinanceControl.Core.Application.UseCases.Transacao;
 public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transacao, TransacaoCreateDto, TransacaoResponseDto, TransacaoUpdateDto>
 {
     private readonly ITransacaoRepository _repository;
-    private readonly ITipoTransacaoRepository _tipoTransacaoRepository;
+    private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransacaoUseCase(ITransacaoRepository repository, ITipoTransacaoRepository tipoRepository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
+    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
-        _tipoTransacaoRepository = tipoRepository;
+        _categoriaTransacaoRepository = categoriaRepository;
         _contaBancariaRepository = contaBancariaRepository;
         _unitOfWork = unitOfWork;
     }
@@ -24,7 +24,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         var Transacaos = await _repository
                                 .GetAll()
                                 .Include(t => t.ContaBancaria)
-                                .Include(t => t.Tipo)
+                                .Include(t => t.Categoria)
                                 .ToListAsync();
 
         return Transacaos.Select(u => new TransacaoResponseDto
@@ -34,9 +34,9 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             Valor = u.Valor,
             DataEfetivacao = u.DataEfetivacao,
             ContaBancariaId = u.ContaBancariaId,
-            TipoId = u.TipoId,
+            CategoriaId = u.CategoriaId,
             ContaBancariaNumero = u.ContaBancaria.Numero,
-            TipoNome = u.Tipo.Nome
+            CategoriaNome = u.Categoria.Nome
         });
     }
 
@@ -50,14 +50,14 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             Valor = Transacao.Valor,
             DataEfetivacao = Transacao.DataEfetivacao,
             ContaBancariaId = Transacao.ContaBancariaId,
-            TipoId = Transacao.TipoId
+            CategoriaId = Transacao.CategoriaId
         };
     }
 
     public async Task AddAsync(TransacaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
-        await ValidarEntidadeExistenteAsync(_tipoTransacaoRepository, dto.TipoId, "Tipo de transação");
+        await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
 
         var Transacao = new Domain.Entities.Transacao
         {
@@ -65,7 +65,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             DataEfetivacao = dto.DataEfetivacao,
             Valor = dto.Valor,
             ContaBancariaId = dto.ContaBancariaId,
-            TipoId = dto.TipoId,
+            CategoriaId = dto.CategoriaId,
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
         };
@@ -77,7 +77,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     public async Task UpdateAsync(TransacaoUpdateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
-        await ValidarEntidadeExistenteAsync(_tipoTransacaoRepository, dto.TipoId, "Tipo de transação");
+        await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
         
         var Transacao = await _repository.GetByIdAsync(dto.Id);
         if (Transacao == null)
@@ -88,7 +88,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         Transacao.DataEfetivacao = dto.DataEfetivacao;
         Transacao.Valor = dto.Valor;
         Transacao.ContaBancariaId = dto.ContaBancariaId;
-        Transacao.TipoId = dto.TipoId;
+        Transacao.CategoriaId = dto.CategoriaId;
 
         await _repository.UpdateAsync(Transacao);
         await _unitOfWork.CommitAsync();

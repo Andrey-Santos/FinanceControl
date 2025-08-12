@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using FinanceControl.Core.Application.UseCases.TipoTransacao;
-using FinanceControl.Core.Application.DTOs.TipoTransacao;
+using FinanceControl.Core.Application.UseCases.CategoriaTransacao;
+using FinanceControl.Core.Application.DTOs.CategoriaTransacao;
 
 namespace Financecontrol.WebApi.Controllers.Web;
 
-public class TipoTransacaoController : Controller
+public class CategoriaTransacaoController : Controller
 {
-    private readonly TipoTransacaoUseCase _useCase;
+    private readonly CategoriaTransacaoUseCase _useCase;
 
-    public TipoTransacaoController(TipoTransacaoUseCase useCase)
+    public CategoriaTransacaoController(CategoriaTransacaoUseCase useCase)
     {
         _useCase = useCase;
     }
@@ -28,7 +28,7 @@ public class TipoTransacaoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TipoTransacaoCreateDto dto)
+    public async Task<IActionResult> Create(CategoriaTransacaoCreateDto dto)
     {
         if (!ModelState.IsValid)
             return View(dto);
@@ -44,7 +44,7 @@ public class TipoTransacaoController : Controller
         if (entity == null)
             return NotFound();
 
-        var dto = new TipoTransacaoUpdateDto
+        var dto = new CategoriaTransacaoUpdateDto
         {
             Nome = entity.Nome
         };
@@ -54,7 +54,7 @@ public class TipoTransacaoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(TipoTransacaoUpdateDto dto)
+    public async Task<IActionResult> Edit(CategoriaTransacaoUpdateDto dto)
     {
         if (!ModelState.IsValid)
             return View(dto);

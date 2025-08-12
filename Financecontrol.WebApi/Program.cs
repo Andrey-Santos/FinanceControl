@@ -4,7 +4,7 @@ using FinanceControl.Core.Application.UseCases.Banco;
 using FinanceControl.Core.Application.UseCases.Cartao;
 using FinanceControl.Core.Application.UseCases.Fatura;
 using FinanceControl.Core.Application.UseCases.Transacao;
-using FinanceControl.Core.Application.UseCases.TipoTransacao;
+using FinanceControl.Core.Application.UseCases.CategoriaTransacao;
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Infrastructure;
 using FinanceControl.Infrastructure.Data;
@@ -33,7 +33,7 @@ builder.Services.AddScoped<IBancoRepository, BancoRepository>();
 builder.Services.AddScoped<ICartaoRepository, CartaoRepository>();
 builder.Services.AddScoped<IFaturaRepository, FaturaRepository>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
-builder.Services.AddScoped<ITipoTransacaoRepository, TipoTransacaoRepository>();
+builder.Services.AddScoped<ICategoriaTransacaoRepository, CategoriaTransacaoRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // ⚙️ UseCases
@@ -43,7 +43,7 @@ builder.Services.AddScoped<BancoUseCase>();
 builder.Services.AddScoped<CartaoUseCase>();
 builder.Services.AddScoped<FaturaUseCase>();
 builder.Services.AddScoped<TransacaoUseCase>();
-builder.Services.AddScoped<TipoTransacaoUseCase>();
+builder.Services.AddScoped<CategoriaTransacaoUseCase>();
 
 // 🔐 JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");

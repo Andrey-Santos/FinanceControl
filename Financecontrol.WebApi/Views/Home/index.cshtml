@@ -1,3 +1,165 @@
 @{
-    ViewBag.Title = "Página Inicial";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+
+    <!-- Navegador de Mês -->
+    <div class="card bg-dark text-white shadow-sm mb-4">
+        <div class="card-body d-flex align-items-center justify-content-center gap-3">
+            <button class="btn btn-outline-light btn-sm" id="btnMesAnterior">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <h4 class="mb-0" id="mesAtual">Agosto 2025</h4>
+            <button class="btn btn-outline-light btn-sm" id="btnMesProximo">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Resumo de saldo -->
+    <div class="card bg-dark text-white shadow-sm mb-4">
+        <div class="card-body d-flex gap-4 justify-content-center">
+            <div class="text-center">
+                <small>Saldo Atual</small>
+                <h5 class="mb-0 text-success">R$ 0,00</h5>
+            </div>
+            <div class="text-center">
+                <small>Saldo Mês</small>
+                <h5 class="mb-0 text-primary">R$ 0,00</h5>
+            </div>
+            <div class="text-center">
+                <small>Mês Anterior</small>
+                <h5 class="mb-0 text-warning">R$ 0,00</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="mb-3 d-flex gap-2">
+        <a asp-controller="Transacao" asp-action="Create" asp-route-tipo="Receita" class="btn btn-success">
+            + Receita
+        </a>
+        <a asp-controller="Transacao" asp-action="Create" asp-route-tipo="Despesa" class="btn btn-danger">
+            + Despesa
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Lista de transações -->
+        <div class="col-md-8">
+            <div class="card bg-dark text-white shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Transações Recentes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table id="tabelaTransacoes" class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="col-md-4">
+            <div class="card bg-dark text-white shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Gastos por Categoria</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoGastos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('graficoGastos');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Alimentação', 'Moradia', 'Transporte'],
+                datasets: [{
+                    label: 'Gastos',
+                    data: [500, 1200, 300],
+                    backgroundColor: ['#f87171', '#facc15', '#60a5fa'],
+                }]
+            }
+        });
+
+        // Controle de navegação do mês
+        const meses = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ];
+        let mesAtual = 7; // Agosto (índice 7)
+        let anoAtual = 2025;
+
+        function atualizarMes() {
+            document.getElementById("mesAtual").textContent = `${meses[mesAtual]} ${anoAtual}`;
+        }
+
+        document.getElementById("btnMesAnterior").addEventListener("click", () => {
+            mesAtual--;
+            if (mesAtual < 0) { mesAtual = 11; anoAtual--; }
+            atualizarMes();
+        });
+
+        document.getElementById("btnMesProximo").addEventListener("click", () => {
+            mesAtual++;
+            if (mesAtual > 11) { mesAtual = 0; anoAtual++; }
+            atualizarMes();
+        });
+
+        atualizarMes();
+
+    async function carregarTransacoes() {
+        const url = `/api/Transacao/PorMes?mes=${mesAtual + 1}&ano=${anoAtual}`;
+        const resp = await fetch(url);
+        const dados = await resp.json();
+
+        const tbody = document.querySelector("#tabelaTransacoes tbody");
+        tbody.innerHTML = "";
+
+        dados.forEach(t => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${new Date(t.dataEfetivacao).toLocaleDateString()}</td>
+                <td>${t.descricao}</td>
+                <td class="${t.tipo === 1 ? 'text-success' : 'text-danger'}">
+                    ${t.tipo === 1 ? '+' : '-'} R$ ${t.valor.toFixed(2)}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("btnMesAnterior").addEventListener("click", () => {
+        mesAtual--;
+        if (mesAtual < 0) { mesAtual = 11; anoAtual--; }
+        atualizarMes();
+        carregarTransacoes();
+    });
+
+    document.getElementById("btnMesProximo").addEventListener("click", () => {
+        mesAtual++;
+        if (mesAtual > 11) { mesAtual = 0; anoAtual++; }
+        atualizarMes();
+        carregarTransacoes();
+    });
+
+    carregarTransacoes();
+
+    </script>
 }

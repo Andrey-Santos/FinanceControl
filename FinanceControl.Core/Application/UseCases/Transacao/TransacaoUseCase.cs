@@ -19,6 +19,31 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         _contaBancariaRepository = contaBancariaRepository;
     }
 
+    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(DateTime? inicio, DateTime? fim)
+    {
+        var query = _repository.GetAll();
+
+        if (inicio.HasValue)
+            query = query.Where(t => t.DataEfetivacao >= inicio.Value);
+
+        if (fim.HasValue)
+            query = query.Where(t => t.DataEfetivacao <= fim.Value);
+
+        var transacoes = await query
+            .AsNoTracking()
+            .ToListAsync();
+
+        return transacoes.Select(t => new TransacaoResponseDto
+        {
+            Id = t.Id,
+            Descricao = t.Descricao,
+            Valor = t.Valor,
+            DataEfetivacao = t.DataEfetivacao,
+            Tipo = t.Tipo,
+            ContaBancariaId = t.ContaBancariaId
+        });
+    }
+    
     public async Task<IEnumerable<TransacaoResponseDto>> GetAllAsync()
     {
         var Transacaos = await _repository

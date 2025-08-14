@@ -37,18 +37,18 @@ public class TransacaoController : Controller
         return View(await _useCase.GetAllAsync());
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Create()
+[HttpGet]
+public async Task<IActionResult> Create(TipoTransacao? tipo)
+{
+    await LoadLists();
+
+    var model = new TransacaoCreateDto
     {
-        await LoadLists();
+        Tipo = tipo ?? TipoTransacao.Receita
+    };
 
-        var model = new TransacaoCreateDto
-        {
-            DataEfetivacao = DateTime.Now
-        };
-
-        return View(model);
-    }
+    return View(model);
+}
 
     [HttpPost]
     [ValidateAntiForgeryToken]

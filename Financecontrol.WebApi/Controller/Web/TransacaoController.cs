@@ -44,7 +44,8 @@ public class TransacaoController : Controller
 
         var model = new TransacaoCreateDto
         {
-            Tipo = tipo ?? TipoTransacao.Receita
+            Tipo = tipo ?? TipoTransacao.Despesa,
+            DataEfetivacao = DateTime.Now
         };
 
         return View(model);

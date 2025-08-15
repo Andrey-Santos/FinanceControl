@@ -22,7 +22,6 @@ public class HomeController : Controller
         var anoAtual = ano ?? hoje.Year;
 
         var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
-        var inicioMesAnterior = inicioMesAtual.AddMonths(-1);
         var fimMesAnterior = inicioMesAtual.AddDays(-1);
         var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
 
@@ -35,7 +34,7 @@ public class HomeController : Controller
         var categorias = transacoesMes.GroupBy(t => t.CategoriaNome)
             .Select(g => new
             {
-                Categoria = g.Key ?? "Outros",
+                Categoria = g.Key,
                 Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor)
             })
             .Where(c => c.Valor != 0)
@@ -43,7 +42,8 @@ public class HomeController : Controller
 
         // Prepara dados para o gráfico
         ViewBag.GraficoCategoriasLabels = categorias.Select(c => c.Categoria).ToList();
-    ViewBag.GraficoCategoriasValores = categorias.Select(c => Math.Abs(c.Valor)).ToList();
+        ViewBag.GraficoCategoriasValores = categorias.Select(c => Math.Abs(c.Valor)).ToList();
+        
         // Cores aleatórias para cada categoria
         var cores = new[] { "#007bff", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#20c997", "#fd7e14", "#17a2b8", "#343a40", "#6610f2" };
         ViewBag.GraficoCategoriasCores = categorias.Select((c, i) => cores[i % cores.Length]).ToList();

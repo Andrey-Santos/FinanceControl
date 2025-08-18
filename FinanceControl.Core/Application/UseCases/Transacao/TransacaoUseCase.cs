@@ -1,6 +1,9 @@
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.Transacao;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using ClosedXML.Excel;
+using FinanceControl.Core.Domain.Enums;
 
 namespace FinanceControl.Core.Application.UseCases.Transacao;
 
@@ -43,7 +46,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             ContaBancariaId = t.ContaBancariaId
         });
     }
-    
+
     public async Task<IEnumerable<TransacaoResponseDto>> GetAllAsync()
     {
         var Transacaos = await _repository
@@ -90,7 +93,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         {
             Descricao = dto.Descricao,
             DataEfetivacao = dto.DataEfetivacao,
-            Valor = dto.Valor,
+            Valor = Math.Abs(dto.Valor),
             ContaBancariaId = dto.ContaBancariaId,
             CategoriaId = dto.CategoriaId,
             Tipo = dto.Tipo,
@@ -106,7 +109,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
         await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
-        
+
         var Transacao = await _repository.GetByIdAsync(dto.Id);
         if (Transacao == null)
             return;
@@ -127,5 +130,40 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     {
         await _repository.DeleteAsync(id);
         await _unitOfWork.CommitAsync();
+    }
+
+    public async Task<int> ImportarAsync(IFormFile arquivo, long contaBancariaId)
+    {
+        if (arquivo == null || arquivo.Length == 0)
+            throw new ArgumentException("Nenhum arquivo selecionado.");
+
+        if (!Path.GetExtension(arquivo.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Formato inválido. Apenas arquivos .xlsx são permitidos.");
+
+        using var stream = new MemoryStream();
+        await arquivo.CopyToAsync(stream);
+        using var workbook = new XLWorkbook(stream);
+        var worksheet = workbook.Worksheet(1);
+
+        var transacoes = new List<TransacaoCreateDto>();
+
+        foreach (var row in worksheet.RowsUsed().Skip(1))
+        {
+            transacoes.Add(new TransacaoCreateDto
+            {
+                DataEfetivacao = row.Cell(1).GetDateTime(),
+                Descricao = row.Cell(2).GetString(),
+                Valor = row.Cell(3).GetValue<double>(),
+                ContaBancariaId = contaBancariaId,
+                Tipo = row.Cell(3).GetValue<double>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
+                CategoriaId = 4
+            });
+        }
+
+        foreach (var transacao in transacoes)
+            await AddAsync(transacao);
+
+        return transacoes.Count;
+
     }
 }

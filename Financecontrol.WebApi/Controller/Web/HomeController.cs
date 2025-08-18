@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-namespace FinanceControl.WebApi.Controllers;
-
 using FinanceControl.Core.Application.UseCases.Transacao;
 using FinanceControl.Core.Domain.Enums;
+
+namespace FinanceControl.WebApi.Controllers;
 
 [JwtAuthorize]
 public class HomeController : Controller

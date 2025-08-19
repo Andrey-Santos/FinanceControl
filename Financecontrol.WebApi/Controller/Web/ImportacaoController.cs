@@ -30,6 +30,7 @@ public class ImportacaoController : Controller
     [HttpPost]
     public async Task<IActionResult> Upload(TransacaoCreateDto transacao, IFormFile arquivo)
     {
+        await LoadLists();
         try
         {
             var vQtdLinhasImportadas = await _transacaoUseCase.ImportarAsync(arquivo, transacao.ContaBancariaId);

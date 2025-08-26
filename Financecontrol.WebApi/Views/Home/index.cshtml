@@ -1,7 +1,7 @@
 @model IEnumerable<FinanceControl.Core.Application.DTOs.Transacao.TransacaoResponseDto>
 
 @{
-    ViewData["Title"] = "Transações";
+    ViewData["Title"] = "Home";
 }
 
 <div class="mb-4">
@@ -53,17 +53,8 @@
 </div>
 
 <div class="row">
-    <!-- Botões de ação -->
-    <div class="col-md-12 mb-3 d-flex justify-content-end gap-2">
-        <a asp-controller="Transacao" asp-action="Create" asp-route-tipo="Receita" class="btn btn-success btn-lg shadow-sm">
-            <i class="bi bi-plus-circle me-2"></i> Receita
-        </a>
-        <a asp-controller="Transacao" asp-action="Create" asp-route-tipo="Despesa" class="btn btn-danger btn-lg shadow-sm">
-            <i class="bi bi-dash-circle me-2"></i> Despesa
-        </a>
-    </div>
-    <!-- Lista -->
-    <div class="col-md-6 mb-4">
+    <!-- Lista de transações -->
+    <div class="col-md-6 mb-3">
         <div class="card bg-dark text-white h-100">
             <div class="card-body">
                 <h5 class="card-title">Lista de Transações</h5>
@@ -73,7 +64,6 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Descrição</th>
-                                <th>Tipo</th>
                                 <th>Valor</th>
                             </tr>
                         </thead>
@@ -83,9 +73,7 @@
                                 <tr>
                                     <td>@item.DataEfetivacao.ToString("dd/MM/yyyy")</td>
                                     <td>@item.Descricao</td>
-                                    <td>@item.Tipo</td>
-                                    <td
-                                        class="@(item.Tipo == FinanceControl.Core.Domain.Enums.TipoTransacao.Receita ? "text-success" : "text-danger")">
+                                    <td class="@(item.Tipo == FinanceControl.Core.Domain.Enums.TipoTransacao.Receita ? "text-success" : "text-danger")">
                                         @item.Valor.ToString("C")
                                     </td>
                                 </tr>
@@ -97,12 +85,33 @@
         </div>
     </div>
 
-    <!-- Gráfico -->
-    <div class="col-md-6 mb-4">
-        <div class="card bg-dark text-white h-100">
+    <!-- Gráficos -->
+    <div class="col-md-6">
+        <!-- Gráfico Geral -->
+        <div class="card bg-dark text-white mb-3">
             <div class="card-body">
-                <h5 class="card-title">Transações por Categoria</h5>
-                <canvas id="graficoCategorias" height="200"></canvas>
+                <h5 class="card-title">Geral</h5>
+                <canvas id="graficoGeral" height="50"></canvas>
+            </div>
+        </div>
+
+        <!-- Receitas e Despesas -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card bg-dark text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Despesas</h5>
+                        <canvas id="graficoDespesas" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card bg-dark text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Receitas</h5>
+                        <canvas id="graficoReceitas" height="180"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -111,30 +120,61 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var ctx = document.getElementById('graficoCategorias').getContext('2d');
-        var chart = new Chart(ctx, {
+        const optionsPadrao = {
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.label || '';
+                            let value = context.parsed;
+                            let valorFormatado = value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            return label + ': ' + valorFormatado;
+                        }
+                    }
+                }
+            }
+        };
+
+        // Gráfico Geral
+        new Chart(document.getElementById('graficoGeral'), {
             type: 'pie',
             data: {
                 labels: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasLabels)),
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasValores)),
                     backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
-                    }]
+                }]
             },
-            options: {
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let label = context.label || '';
-                                let value = context.parsed;
-                                let valorFormatado = value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                                return label + ': ' + valorFormatado;
-                            }
-                        }
-                    }
-                }
-            }
+            options: optionsPadrao
+        });
+
+        // Gráfico Despesas
+        new Chart(document.getElementById('graficoDespesas'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(ViewBag.GraficoDespesasValores)),
+                    backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
+                }]
+            },
+            options: optionsPadrao
+        });
+
+        // Gráfico Receitas
+        new Chart(document.getElementById('graficoReceitas'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(ViewBag.GraficoReceitasValores)),
+                    backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
+                }]
+            },
+            options: optionsPadrao
         });
     </script>
 }

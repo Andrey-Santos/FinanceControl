@@ -40,9 +40,29 @@ public class HomeController : Controller
             .Where(c => c.Valor != 0)
             .ToList();
 
+        var despesas = transacoesMes.GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Despesa ? t.Valor : 0)
+            })
+            .Where(c => c.Valor != 0)
+            .ToList();
+
+        var receitas = transacoesMes.GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : 0)
+            })
+            .Where(c => c.Valor != 0)
+            .ToList();
+
         // Prepara dados para o gráfico
         ViewBag.GraficoCategoriasLabels = categorias.Select(c => c.Categoria).ToList();
         ViewBag.GraficoCategoriasValores = categorias.Select(c => Math.Abs(c.Valor)).ToList();
+        ViewBag.GraficoDespesasValores = despesas.Select(c => Math.Abs(c.Valor)).ToList();
+        ViewBag.GraficoReceitasValores = receitas.Select(c => Math.Abs(c.Valor)).ToList();
         
         // Cores aleatórias para cada categoria
         var cores = new[] { "#007bff", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#20c997", "#fd7e14", "#17a2b8", "#343a40", "#6610f2" };

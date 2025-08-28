@@ -1,0 +1,116 @@
+@model IEnumerable<FinanceControl.Core.Application.DTOs.ContaPagarReceber.ContaPagarReceberResponseDto>
+
+@{
+    ViewData["Title"] = "Contas a Pagar / Receber";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-white">Contas a Pagar / Receber</h2>
+
+    <!-- Botões de ação -->
+    <div class="d-flex gap-2 mb-3">
+        <a asp-action="Create" class="btn btn-success">Adicionar Conta</a>
+        <a id="btnEditar" class="btn btn-primary disabled">Editar</a>
+        <button id="btnExcluir" class="btn btn-danger disabled">Excluir</button>
+        <button id="btnPagar" class="btn btn-warning disabled">Marcar como Paga</button>
+    </div>
+
+    <!-- Tabela -->
+    <table class="table table-dark table-striped table-hover rounded shadow-sm" id="tabelaContas">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Data Vencimento</th>
+                <th>Status</th>
+                <th>Tipo</th>
+                <th>Conta Bancária</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var conta in Model)
+            {
+                string statusClass = conta.Status switch
+                {
+                    FinanceControl.Core.Domain.Enums.StatusContaPagarReceber.Atrasada => "text-danger fw-bold",
+                    FinanceControl.Core.Domain.Enums.StatusContaPagarReceber.Paga => "text-success",
+                    _ => "text-warning"
+                };
+
+                <tr data-id="@conta.Id" style="cursor: pointer;">
+                    <td>@conta.Id</td>
+                    <td>@conta.Descricao</td>
+                    <td>@conta.Valor.ToString("C")</td>
+                    <td>@conta.DataVencimento.ToString("dd/MM/yyyy")</td>
+                    <td class="@statusClass">@conta.Status</td>
+                    <td>@conta.Tipo</td>
+                    <td>@conta.ContaBancariaNumero</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <form id="antiForgeryForm" style="display:none">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <script>
+        let contaSelecionadaId = null;
+
+        document.querySelectorAll("#tabelaContas tbody tr").forEach(row => {
+            row.addEventListener("click", () => {
+                // Remove seleção anterior
+                document.querySelectorAll("#tabelaContas tbody tr").forEach(r => r.classList.remove("table-active"));
+
+                // Adiciona seleção
+                row.classList.add("table-active");
+                contaSelecionadaId = row.getAttribute("data-id");
+
+                // Habilita botões
+                document.getElementById("btnEditar").classList.remove("disabled");
+                document.getElementById("btnExcluir").classList.remove("disabled");
+                document.getElementById("btnPagar").classList.remove("disabled");
+            });
+        });
+
+        document.getElementById("btnEditar").addEventListener("click", function () {
+            if (contaSelecionadaId) {
+                window.location.href = `/ContaPagarReceber/Edit/${contaSelecionadaId}`;
+            }
+        });
+
+        document.getElementById("btnExcluir").addEventListener("click", function () {
+            if (contaSelecionadaId && confirm("Tem certeza que deseja excluir esta conta?")) {
+                const token = document.querySelector("#antiForgeryForm input[name='__RequestVerificationToken']").value;
+
+                fetch(`/ContaPagarReceber/Delete/${contaSelecionadaId}`,
+                    {
+                        method: "POST",
+                        headers: { 'RequestVerificationToken': token }
+                    }).then(response => {
+                        if (response.ok)
+                            location.reload();
+                        else
+                            alert("Erro ao excluir.");
+                    });
+            }
+        });
+
+        document.getElementById("btnPagar").addEventListener("click", function () {
+            if (contaSelecionadaId) {
+                fetch(`/ContaPagarReceber/PagarHoje/${contaSelecionadaId}`, {
+                    method: "POST",
+                    headers: { 'RequestVerificationToken': token }
+                }).then(response => {
+                    if (response.ok)
+                        location.reload();
+                    else
+                        alert("Erro ao excluir.");
+                });
+            }
+        });
+    </script>
+}

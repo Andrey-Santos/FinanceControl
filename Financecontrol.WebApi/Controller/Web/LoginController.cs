@@ -14,6 +14,9 @@ public class LoginController : Controller
 
     public IActionResult Index()
     {
+        if(HttpContext.Request.Cookies.ContainsKey("jwt"))
+            return RedirectToAction("Index", "Home");
+            
         return View();
     }
 

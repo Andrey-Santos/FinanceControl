@@ -2,14 +2,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# copia tudo (volta para raiz da solução)
-COPY .. .
+# Copia tudo para dentro do container
+COPY . .
 
-# restaura a solução completa
+# Restaura dependências
 RUN dotnet restore FinanceControl.sln
 
-# publica o WebApi (corrigido o caminho)
-RUN dotnet publish FinanceControl.WebApi.csproj -c Release -o /app -r linux-x64 --no-self-contained
+# Publica apenas o WebApi
+RUN dotnet publish FinanceControl.WebApi/FinanceControl.WebApi.csproj -c Release -o /app -r linux-x64 --no-self-contained
 
 # Etapa 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime

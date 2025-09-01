@@ -23,6 +23,7 @@
                 <th>Descrição</th>
                 <th>Valor</th>
                 <th>Data Vencimento</th>
+                <th>Data Pagamento</th>
                 <th>Status</th>
                 <th>Tipo</th>
                 <th>Conta Bancária</th>
@@ -43,6 +44,7 @@
                     <td>@conta.Descricao</td>
                     <td>@conta.Valor.ToString("C")</td>
                     <td>@conta.DataVencimento.ToString("dd/MM/yyyy")</td>
+                    <td>@(conta.DataPagamento.HasValue? conta.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
                     <td class="@statusClass">@conta.Status</td>
                     <td>@conta.Tipo</td>
                     <td>@conta.ContaBancariaNumero</td>
@@ -50,6 +52,35 @@
             }
         </tbody>
     </table>
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
+    }
+</div>
+
+<!-- Modal Pagar -->
+<div class="modal fade" id="modalPagar" tabindex="-1" aria-labelledby="modalPagarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white shadow">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="modalPagarLabel">Confirmar Pagamento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formPagar">
+                    <div class="mb-3">
+                        <label for="dataPagamento" class="form-label">Data de Pagamento</label>
+                        <input type="date" class="form-control bg-secondary text-white" id="dataPagamento" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmarPagar" class="btn btn-warning">Confirmar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -58,6 +89,7 @@
     </form>
 
     <script>
+        const token = document.querySelector("#antiForgeryForm input[name='__RequestVerificationToken']").value;
         let contaSelecionadaId = null;
 
         document.querySelectorAll("#tabelaContas tbody tr").forEach(row => {
@@ -84,8 +116,6 @@
 
         document.getElementById("btnExcluir").addEventListener("click", function () {
             if (contaSelecionadaId && confirm("Tem certeza que deseja excluir esta conta?")) {
-                const token = document.querySelector("#antiForgeryForm input[name='__RequestVerificationToken']").value;
-
                 fetch(`/ContaPagarReceber/Delete/${contaSelecionadaId}`,
                     {
                         method: "POST",
@@ -93,24 +123,40 @@
                     }).then(response => {
                         if (response.ok)
                             location.reload();
-                        else
-                            alert("Erro ao excluir.");
                     });
             }
         });
 
+        // Botão pagar -> abre modal
         document.getElementById("btnPagar").addEventListener("click", function () {
             if (contaSelecionadaId) {
-                fetch(`/ContaPagarReceber/PagarHoje/${contaSelecionadaId}`, {
-                    method: "POST",
-                    headers: { 'RequestVerificationToken': token }
-                }).then(response => {
-                    if (response.ok)
-                        location.reload();
-                    else
-                        alert("Erro ao excluir.");
-                });
+                // Define a data atual como padrão no input
+                const hoje = new Date();
+                document.getElementById("dataPagamento").value = hoje.toISOString().split("T")[0];
+
+                var modal = new bootstrap.Modal(document.getElementById("modalPagar"));
+                modal.show();
             }
         });
+
+        // Confirmar pagamento
+        document.getElementById("confirmarPagar").addEventListener("click", function () {
+            const dataPagamento = document.getElementById("dataPagamento").value;
+            if (!dataPagamento) {
+                alert("Selecione uma data válida.");
+                return;
+            }
+
+            fetch(`/ContaPagarReceber/Pagar/${contaSelecionadaId}?dataPagamento=${encodeURIComponent(dataPagamento)}`, {
+                method: "POST",
+                headers: { 'RequestVerificationToken': token }
+            }).then(response => {
+                if (response.ok)
+                    window.location.reload()
+                else
+                    alert("Erro ao marcar como paga. Verifique se a conta já não está paga.");
+            });
+        });
+
     </script>
 }

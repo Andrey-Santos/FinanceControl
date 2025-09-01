@@ -48,7 +48,7 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
         };
     }
 
-    public async Task AddAsync(ContaBancariaCreateDto dto)
+    public async Task<long> AddAsync(ContaBancariaCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_usuarioRepository, dto.UsuarioId, "Usuário");
         await ValidarEntidadeExistenteAsync(_bancoRepository, dto.BancoId, "Banco");
@@ -64,6 +64,7 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
 
         await _repository.AddAsync(contas);
         await _unitOfWork.CommitAsync();
+        return contas.Id;
     }
 
     public async Task UpdateAsync(ContaBancariaUpdateDto dto)

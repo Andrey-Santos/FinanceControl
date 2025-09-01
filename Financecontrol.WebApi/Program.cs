@@ -16,6 +16,8 @@ using FinanceControl.Infrastructure.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using FinanceControl.Core.Application.UseCases.ContaPagarReceber;
+using Financecontrol.WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,7 @@ builder.Services.AddScoped<IFaturaRepository, FaturaRepository>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 builder.Services.AddScoped<ICategoriaTransacaoRepository, CategoriaTransacaoRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IContaPagarReceberRepository, ContaPagarReceberRepository>();
 
 // ⚙️ UseCases
 builder.Services.AddScoped<UsuarioUseCase>();
@@ -44,6 +47,7 @@ builder.Services.AddScoped<CartaoUseCase>();
 builder.Services.AddScoped<FaturaUseCase>();
 builder.Services.AddScoped<TransacaoUseCase>();
 builder.Services.AddScoped<CategoriaTransacaoUseCase>();
+builder.Services.AddScoped<ContaPagarReceberUseCase>();
 
 // 🔐 JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");
@@ -88,7 +92,10 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddHttpClient();
 
 // 🧭 MVC e Views
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<CustomExceptionFilter>();
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

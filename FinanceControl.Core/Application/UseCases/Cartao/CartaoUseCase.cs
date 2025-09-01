@@ -44,7 +44,7 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
         };
     }
 
-    public async Task AddAsync(CartaoCreateDto dto)
+    public async Task<long> AddAsync(CartaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
 
@@ -61,6 +61,8 @@ public class CartaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Cartao, C
 
         await _repository.AddAsync(Cartao);
         await _unitOfWork.CommitAsync();
+
+        return Cartao.Id;
     }
 
     public async Task UpdateAsync(CartaoUpdateDto dto)

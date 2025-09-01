@@ -8,7 +8,7 @@ public interface IBaseUseCase<TEntity, TCreateDto, TResponseDto, TUpdateDto>
 {
     Task<IEnumerable<TResponseDto>> GetAllAsync();
     Task<TResponseDto?> GetByIdAsync(long id);
-    Task AddAsync(TCreateDto dto);
+    Task<long> AddAsync(TCreateDto dto);
     Task UpdateAsync(TUpdateDto dto);
     Task DeleteAsync(long id);
 }

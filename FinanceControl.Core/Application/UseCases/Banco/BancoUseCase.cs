@@ -34,7 +34,7 @@ public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, Ban
         };
     }
 
-    public async Task AddAsync(BancoCreateDto dto)
+    public async Task<long> AddAsync(BancoCreateDto dto)
     {
         var Banco = new Domain.Entities.Banco
         {
@@ -43,6 +43,8 @@ public class BancoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Banco, Ban
 
         await _repository.AddAsync(Banco);
         await _unitOfWork.CommitAsync();
+
+        return Banco.Id;
     }
 
     public async Task UpdateAsync(BancoUpdateDto dto)

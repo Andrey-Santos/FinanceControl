@@ -84,12 +84,12 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         };
     }
 
-    public async Task AddAsync(TransacaoCreateDto dto)
+    public async Task<long> AddAsync(TransacaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
         await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
 
-        var Transacao = new Domain.Entities.Transacao
+        var transacao = new Domain.Entities.Transacao
         {
             Descricao = dto.Descricao,
             DataEfetivacao = dto.DataEfetivacao,
@@ -101,8 +101,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             DataAlteracao = DateTime.UtcNow
         };
 
-        await _repository.AddAsync(Transacao);
+        await _repository.AddAsync(transacao);
         await _unitOfWork.CommitAsync();
+
+        return transacao.Id;
     }
 
     public async Task UpdateAsync(TransacaoUpdateDto dto)
@@ -153,9 +155,9 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             {
                 DataEfetivacao = row.Cell(1).GetDateTime(),
                 Descricao = row.Cell(2).GetString(),
-                Valor = row.Cell(3).GetValue<double>(),
+                Valor = row.Cell(3).GetValue<decimal>(),
                 ContaBancariaId = contaBancariaId,
-                Tipo = row.Cell(3).GetValue<double>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
+                Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
                 CategoriaId = 4
             });
         }

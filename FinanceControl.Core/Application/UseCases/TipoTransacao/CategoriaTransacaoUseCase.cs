@@ -34,7 +34,7 @@ public class CategoriaTransacaoUseCase : IBaseUseCase<Domain.Entities.CategoriaT
         };
     }
 
-    public async Task AddAsync(CategoriaTransacaoCreateDto dto)
+    public async Task<long> AddAsync(CategoriaTransacaoCreateDto dto)
     {
         var CategoriaTransacao = new Domain.Entities.CategoriaTransacao
         {
@@ -45,6 +45,8 @@ public class CategoriaTransacaoUseCase : IBaseUseCase<Domain.Entities.CategoriaT
 
         await _repository.AddAsync(CategoriaTransacao);
         await _unitOfWork.CommitAsync();
+
+        return CategoriaTransacao.Id;
     }
 
     public async Task UpdateAsync(CategoriaTransacaoUpdateDto dto)

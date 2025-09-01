@@ -14,5 +14,6 @@ public class FinanceDbContext : DbContext
     public DbSet<Fatura> Faturas => Set<Fatura>();
     public DbSet<Transacao> Transacoes => Set<Transacao>();
     public DbSet<CategoriaTransacao> CategoriasTransacao => Set<CategoriaTransacao>();
+    public DbSet<ContaPagarReceber> ContaPagarReceber => Set<ContaPagarReceber>();
 
 }

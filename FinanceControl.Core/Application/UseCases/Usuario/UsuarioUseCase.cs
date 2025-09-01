@@ -35,18 +35,20 @@ public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuari
         };
     }
 
-    public async Task AddAsync(CreateUsuarioDto dto)
+    public async Task<long> AddAsync(CreateUsuarioDto dto)
     {
         var usuario = new Domain.Entities.Usuario
         {
             Nome = dto.Nome,
-            SenhaHash =  BCrypt.Net.BCrypt.HashPassword(dto.Senha),
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
         };
 
         await _repository.AddAsync(usuario);
         await _unitOfWork.CommitAsync();
+        
+        return usuario.Id;
     }
 
     public async Task UpdateAsync(UsuarioResponseDto dto)

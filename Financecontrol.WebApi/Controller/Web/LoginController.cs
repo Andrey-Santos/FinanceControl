@@ -14,17 +14,33 @@ public class LoginController : Controller
 
     public IActionResult Index()
     {
-        if(HttpContext.Request.Cookies.ContainsKey("jwt"))
+        if (HttpContext.Request.Cookies.ContainsKey("jwt"))
             return RedirectToAction("Index", "Home");
-            
+
+        return View();
+    }
+
+    public IActionResult Create()
+    {
         return View();
     }
 
     [HttpPost]
+    public async Task<IActionResult> Create(LoginCreateDto dto)
+    {
+        var client = _httpClientFactory.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/Auth/register", dto);
+
+        if (response.IsSuccessStatusCode)
+            return RedirectToAction("Index");
+
+        ViewBag.Erro = "Não foi possível criar a conta.";
+        return View(dto);
+    }
     public async Task<IActionResult> Index(LoginRequestDto dto)
     {
         var client = _httpClientFactory.CreateClient();
-        var response = await client.PostAsJsonAsync("http://localhost:5020/api/Auth/login", dto);
+        var response = await client.PostAsJsonAsync("/api/Auth/login", dto);
 
         if (response.IsSuccessStatusCode)
         {

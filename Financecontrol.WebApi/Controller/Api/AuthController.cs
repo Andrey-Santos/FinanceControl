@@ -30,4 +30,27 @@ public class AuthController : ControllerBase
             Nome = usuario.Nome
         });
     }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] LoginCreateDto dto)
+    {
+        var usuarioExistente = await _usuarioRepository.GetByUsernameAsync(dto.Nome);
+        if (usuarioExistente != null)
+            return BadRequest("Nome de usuário já cadastrado.");
+
+        // Criptografa a senha
+        var senhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
+
+        // Cria entidade de usuário (ajuste conforme sua entidade)
+        var novoUsuario = new FinanceControl.Core.Domain.Entities.Usuario
+        {
+            Nome = dto.Nome,
+            //Email = dto.Email,
+            SenhaHash = senhaHash
+        };
+
+        await _usuarioRepository.AddAsync(novoUsuario);
+
+        return Ok("Usuário criado com sucesso.");
+    }
 }

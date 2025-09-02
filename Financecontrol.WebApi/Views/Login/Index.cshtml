@@ -4,6 +4,7 @@
 }
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8" />
     <title>Login</title>
@@ -14,6 +15,7 @@
     <!-- Estilo customizado -->
     <link href="~/css/login.css" rel="stylesheet" />
 </head>
+
 <body class="text-white d-flex justify-content-center align-items-center vh-100">
 
     <div class="login-box bg-dark text-white rounded-4 p-5 shadow">
@@ -28,13 +30,16 @@
         <form asp-action="Index" method="post">
             <div class="mb-3">
                 <label asp-for="Nome" class="form-label">Nome</label>
-                <input asp-for="Nome" type="text" class="form-control bg-dark-subtle text-white border-secondary" placeholder="Seu nome" />
+                <input asp-for="Nome" type="text" class="form-control bg-dark-subtle text-white border-secondary"
+                    placeholder="Seu nome" />
             </div>
 
             <div class="mb-3">
                 <label asp-for="Senha" class="form-label">Senha</label>
                 <div class="input-group">
-                    <input asp-for="Senha" type="password" class="form-control bg-dark-subtle text-white border-secondary" id="password" placeholder="••••••••" />
+                    <input asp-for="Senha" type="password"
+                        class="form-control bg-dark-subtle text-white border-secondary" id="password"
+                        placeholder="••••••••" />
                     <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
                         <i class="bi bi-eye"></i>
                     </button>
@@ -60,9 +65,16 @@
 
             <div class="text-center text-secondary small">
                 Não tem uma conta?
-                <a href="#" class="text-decoration-none text-primary">Cadastre-se</a>
+                <a href="#/Create" class="text-decoration-none text-primary">Cadastre-se</a>
             </div>
         </form>
+
+        <div class="d-flex justify-content-end"></div>
+            @if (TempData["Erro"] != null)
+            {
+                <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
+            }
+        </div>
     </div>
 
     <!-- Bootstrap + Ícones -->
@@ -75,4 +87,5 @@
         }
     </script>
 </body>
+
 </html>

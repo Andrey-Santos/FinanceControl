@@ -12,6 +12,7 @@ public class LoginController : Controller
         _httpClientFactory = httpClientFactory;
     }
 
+    [HttpGet]
     public IActionResult Index()
     {
         if (HttpContext.Request.Cookies.ContainsKey("jwt"))
@@ -20,8 +21,12 @@ public class LoginController : Controller
         return View();
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
+        if (HttpContext.Request.Cookies.ContainsKey("jwt"))
+            return RedirectToAction("Index", "Home");
+
         return View();
     }
 

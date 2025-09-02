@@ -31,8 +31,8 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] LoginCreateDto dto)
+    [HttpPost("Create")]
+    public async Task<IActionResult> Create([FromBody] LoginCreateDto dto)
     {
         var usuarioExistente = await _usuarioRepository.GetByUsernameAsync(dto.Nome);
         if (usuarioExistente != null)

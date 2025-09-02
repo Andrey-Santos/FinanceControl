@@ -29,7 +29,7 @@ public class LoginController : Controller
     public async Task<IActionResult> Create(LoginCreateDto dto)
     {
         var client = _httpClientFactory.CreateClient();
-        var response = await client.PostAsJsonAsync("/api/Auth/register", dto);
+        var response = await client.PostAsJsonAsync("/api/Auth/create", dto);
 
         if (response.IsSuccessStatusCode)
             return RedirectToAction("Index");

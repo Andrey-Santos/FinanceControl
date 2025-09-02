@@ -18,7 +18,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto dto)
     {
-        var usuario = await _usuarioRepository.GetByUsernameAsync(dto.Nome);
+        var usuario = await _usuarioRepository.GetByEmailAsync(dto.Email);
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash))
             return Unauthorized("Usuário ou senha inválidos");
 
@@ -27,26 +27,24 @@ public class AuthController : ControllerBase
         return Ok(new LoginResponseDto
         {
             Token = token,
-            Nome = usuario.Nome
+            Nome = usuario.Nome,
+            Email = usuario.Email
         });
     }
 
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] LoginCreateDto dto)
     {
-        var usuarioExistente = await _usuarioRepository.GetByUsernameAsync(dto.Nome);
+        var usuarioExistente = await _usuarioRepository.GetByEmailAsync(dto.Email);
         if (usuarioExistente != null)
-            return BadRequest("Nome de usuário já cadastrado.");
-
-        // Criptografa a senha
-        var senhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
+            return BadRequest("E-mail de usuário já cadastrado.");
 
         // Cria entidade de usuário (ajuste conforme sua entidade)
         var novoUsuario = new FinanceControl.Core.Domain.Entities.Usuario
         {
             Nome = dto.Nome,
-            //Email = dto.Email,
-            SenhaHash = senhaHash
+            Email = dto.Email,
+            Senha = dto.Senha
         };
 
         await _usuarioRepository.AddAsync(novoUsuario);

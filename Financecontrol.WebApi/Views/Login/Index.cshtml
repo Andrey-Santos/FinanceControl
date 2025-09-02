@@ -29,9 +29,9 @@
 
         <form asp-action="Index" method="post">
             <div class="mb-3">
-                <label asp-for="Nome" class="form-label">Nome</label>
-                <input asp-for="Nome" type="text" class="form-control bg-dark-subtle text-white border-secondary"
-                    placeholder="Seu nome" />
+                <label asp-for="Email" class="form-label">E-mail</label>
+                <input asp-for="Email" type="text" class="form-control bg-dark-subtle border-secondary"
+                    placeholder="Seu email" />
             </div>
 
             <div class="mb-3">
@@ -46,10 +46,12 @@
                 </div>
             </div>
 
-            @if (ViewBag.Erro != null)
-            {
-                <div class="alert alert-danger py-2 px-3 small">@ViewBag.Erro</div>
-            }
+            <div class="mb-3">
+                @if (TempData["Erro"] != null)
+                {
+                    <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
+                }
+            </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
@@ -65,16 +67,9 @@
 
             <div class="text-center text-secondary small">
                 Não tem uma conta?
-                <a href="#/Create" class="text-decoration-none text-primary">Cadastre-se</a>
+                <a asp-action="Create" asp-controller="Login" class="text-decoration-none text-primary">Cadastre-se</a>
             </div>
         </form>
-
-        <div class="d-flex justify-content-end"></div>
-            @if (TempData["Erro"] != null)
-            {
-                <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
-            }
-        </div>
     </div>
 
     <!-- Bootstrap + Ícones -->

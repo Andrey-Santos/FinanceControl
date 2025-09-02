@@ -9,8 +9,8 @@ public class UsuarioRepository : BaseRepository<Usuario>, IUsuarioRepository
 {
     public UsuarioRepository(FinanceDbContext context) : base(context) { }
 
-    public async Task<Usuario?> GetByUsernameAsync(string nome)
+    public async Task<Usuario?> GetByEmailAsync(string email)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.Nome == nome);
+        return await _dbSet.FirstOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper());
     }
 }

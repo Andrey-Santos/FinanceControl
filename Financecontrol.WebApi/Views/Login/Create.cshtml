@@ -1,25 +1,81 @@
+@model FinanceControl.Core.Application.DTOs.Login.LoginCreateDto
 @{
-    ViewData["Title"] = "Criar Conta";
+    Layout = null;
 }
+<head>
+    <meta charset="utf-8" />
+    <title>Cadastrar-se</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<h2>Criar Conta</h2>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Estilo customizado -->
+    <link href="~/css/login.css" rel="stylesheet" />
+</head>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label for="Nome">Nome</label>
-        <input type="text" class="form-control" id="Nome" name="Nome" required />
-    </div>
-    <div class="form-group">
-        <label for="Email">Email</label>
-        <input type="email" class="form-control" id="Email" name="Email" required />
-    </div>
-    <div class="form-group">
-        <label for="Senha">Senha</label>
-        <input type="password" class="form-control" id="Senha" name="Senha" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Criar Conta</button>
-</form>
+<body class="text-white d-flex justify-content-center align-items-center vh-100">
 
-<div class="mt-3">
-    <a href="/Login/Index">Já tem conta? Faça login</a>
-</div>
+    <div class="login-box bg-dark text-white rounded-4 p-5 shadow">
+        <div class="text-center mb-4">
+            <div class="icon-circle mb-3">
+                <i class="bi bi-person-plus-fill fs-3 text-white"></i>
+            </div>
+            <h2 class="fw-bold">Criar Conta</h2>
+            <p class="text-secondary">Preencha os campos para se cadastrar</p>
+        </div>
+
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label asp-for="Nome" class="form-label">Nome</label>
+                <input asp-for="Nome" type="text" class="form-control bg-dark-subtle text-white border-secondary"
+                    placeholder="Seu nome" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">E-mail</label>
+                <input asp-for="Email" type="email" class="form-control bg-dark-subtle text-white border-secondary"
+                    placeholder="seu@email.com" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Senha" class="form-label">Senha</label>
+                <div class="input-group">
+                    <input asp-for="Senha" type="password"
+                        class="form-control bg-dark-subtle text-white border-secondary" id="password"
+                        placeholder="••••••••" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                @if (TempData["Erro"] != null)
+                {
+                    <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
+                }
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-login-gradient text-white">Cadastrar</button>
+            </div>
+
+            <div class="text-center text-secondary small">
+                Já tem uma conta?
+                <a asp-action="Index" asp-controller="Login" class="text-decoration-none text-primary">Entrar</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap + Ícones -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("password");
+            input.type = input.type === "password" ? "text" : "password";
+        }
+    </script>
+</body>
+
+</html>

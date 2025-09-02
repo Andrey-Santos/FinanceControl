@@ -1,10 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using FinanceControl.Core.Application.DTOs.Login;
+using FinanceControl.Core.Application.DTOs;
 
 namespace FinanceControl.WebApi.Controllers.Web;
 
 public class LoginController : Controller
 {
+    [HttpGet]
+    public IActionResult Logout()
+    {
+        HttpContext.Response.Cookies.Delete("jwt");
+        return RedirectToAction("Index");
+    }
     private readonly IHttpClientFactory _httpClientFactory;
 
     public LoginController(IHttpClientFactory httpClientFactory)
@@ -34,17 +41,21 @@ public class LoginController : Controller
     public async Task<IActionResult> Create(LoginCreateDto dto)
     {
         var client = _httpClientFactory.CreateClient();
+        client.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host.Value}");
         var response = await client.PostAsJsonAsync("/api/Auth/create", dto);
 
         if (response.IsSuccessStatusCode)
             return RedirectToAction("Index");
 
-        ViewBag.Erro = "Não foi possível criar a conta.";
+        TempData["Erro"] = await response.Content.ReadAsStringAsync();
         return View(dto);
     }
+
+    [HttpPost]
     public async Task<IActionResult> Index(LoginRequestDto dto)
     {
         var client = _httpClientFactory.CreateClient();
+        client.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host.Value}");
         var response = await client.PostAsJsonAsync("/api/Auth/login", dto);
 
         if (response.IsSuccessStatusCode)
@@ -58,7 +69,7 @@ public class LoginController : Controller
             }
         }
 
-        ViewBag.Erro = "Credenciais inválidas.";
+        TempData["Erro"] = await response.Content.ReadAsStringAsync();
         return View(dto);
     }
 }

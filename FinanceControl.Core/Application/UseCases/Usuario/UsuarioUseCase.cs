@@ -4,7 +4,7 @@ using BCrypt.Net;
 
 namespace FinanceControl.Core.Application.UseCases.Usuario;
 
-public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuarioDto, UsuarioResponseDto, UsuarioResponseDto>
+public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, UsuarioCreateDto, UsuarioResponseDto, UsuarioResponseDto>
 {
     private readonly IUsuarioRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -35,11 +35,12 @@ public class UsuarioUseCase : IBaseUseCase<Domain.Entities.Usuario, CreateUsuari
         };
     }
 
-    public async Task<long> AddAsync(CreateUsuarioDto dto)
+    public async Task<long> AddAsync(UsuarioCreateDto dto)
     {
         var usuario = new Domain.Entities.Usuario
         {
             Nome = dto.Nome,
+            Email = dto.Email,
             SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha),
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow

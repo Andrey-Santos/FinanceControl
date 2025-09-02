@@ -1,4 +1,7 @@
+using DocumentFormat.OpenXml.EMMA;
 using FinanceControl.Core.Application.DTOs.Login;
+using FinanceControl.Core.Application.DTOs.Usuario;
+using FinanceControl.Core.Application.UseCases.Usuario;
 using FinanceControl.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,13 @@ public class AuthController : ControllerBase
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IJwtTokenService _jwtService;
+    private readonly UsuarioUseCase _usuarioUseCase;
 
-    public AuthController(IUsuarioRepository usuarioRepository, IJwtTokenService jwtService)
+    public AuthController(IUsuarioRepository usuarioRepository, IJwtTokenService jwtService, UsuarioUseCase usuarioUseCase)
     {
         _usuarioRepository = usuarioRepository;
         _jwtService = jwtService;
+        _usuarioUseCase = usuarioUseCase;
     }
 
     [HttpPost("login")]
@@ -35,19 +40,14 @@ public class AuthController : ControllerBase
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] LoginCreateDto dto)
     {
-        var usuarioExistente = await _usuarioRepository.GetByEmailAsync(dto.Email);
-        if (usuarioExistente != null)
-            return BadRequest("E-mail de usuário já cadastrado.");
+         UsuarioCreateDto model = new UsuarioCreateDto();
+        model.Email = dto.Email;
+        model.Nome = dto.Nome;
+        model.Senha = dto.Senha;
 
-        // Cria entidade de usuário (ajuste conforme sua entidade)
-        var novoUsuario = new FinanceControl.Core.Domain.Entities.Usuario
-        {
-            Nome = dto.Nome,
-            Email = dto.Email,
-            Senha = dto.Senha
-        };
-
-        await _usuarioRepository.AddAsync(novoUsuario);
+        var resultado = await _usuarioUseCase.AddAsync(model);
+        if (resultado == 0)
+            return BadRequest(resultado);
 
         return Ok("Usuário criado com sucesso.");
     }

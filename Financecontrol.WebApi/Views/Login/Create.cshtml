@@ -27,13 +27,13 @@
         <form asp-action="Create" method="post">
             <div class="mb-3">
                 <label asp-for="Nome" class="form-label">Nome</label>
-                <input asp-for="Nome" type="text" class="form-control bg-dark-subtle text-white border-secondary"
+                <input asp-for="Nome" type="text" class="form-control bg-dark-subtle border-secondary"
                     placeholder="Seu nome" />
             </div>
 
             <div class="mb-3">
                 <label asp-for="Email" class="form-label">E-mail</label>
-                <input asp-for="Email" type="email" class="form-control bg-dark-subtle text-white border-secondary"
+                <input asp-for="Email" type="email" class="form-control bg-dark-subtle border-secondary"
                     placeholder="seu@email.com" />
             </div>
 
@@ -41,7 +41,7 @@
                 <label asp-for="Senha" class="form-label">Senha</label>
                 <div class="input-group">
                     <input asp-for="Senha" type="password"
-                        class="form-control bg-dark-subtle text-white border-secondary" id="password"
+                        class="form-control bg-dark-subtle border-secondary" id="password"
                         placeholder="••••••••" />
                     <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
                         <i class="bi bi-eye"></i>

@@ -26,7 +26,7 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 // 🔌 Conexão com banco de dados
 builder.Services.AddDbContext<FinanceDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 📦 Repositórios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();

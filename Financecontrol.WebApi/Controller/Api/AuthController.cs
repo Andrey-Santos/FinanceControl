@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] LoginCreateDto dto)
     {
-         UsuarioCreateDto model = new UsuarioCreateDto();
+        UsuarioCreateDto model = new UsuarioCreateDto();
         model.Email = dto.Email;
         model.Nome = dto.Nome;
         model.Senha = dto.Senha;

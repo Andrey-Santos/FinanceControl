@@ -151,6 +151,12 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         foreach (var row in worksheet.RowsUsed().Skip(1))
         {
+            string categoriaNome = row.Cell(4).GetString() == string.Empty ? "Outros" : row.Cell(4).GetString();
+            long categoriaId = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? 4; // Categoria padrão "Outros"
+
+            if (categoriaId == 0)
+                throw new Exception($"Categoria '{row.Cell(4).GetString()}' não encontrada e a categoria padrão 'Outros' também não existe.");
+
             transacoes.Add(new TransacaoCreateDto
             {
                 DataEfetivacao = row.Cell(1).GetDateTime(),
@@ -158,7 +164,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 Valor = row.Cell(3).GetValue<decimal>(),
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
-                CategoriaId = 4
+                CategoriaId = categoriaId
             });
         }
 

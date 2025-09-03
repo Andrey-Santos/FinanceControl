@@ -17,23 +17,18 @@
                 </div>
 
                 <div class="d-flex justify-content-end">
-                @if (TempData["Erro"] != null)
-                {
-                    <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
-                }
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
+                    }
                     <button type="submit" class="btn btn-outline-light">Salvar</button>
                 </div>
+                @section Scripts {
+                    @{
+                        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                    }
+                }
             </form>
-        }
-    }
-}
-
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

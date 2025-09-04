@@ -151,8 +151,8 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         foreach (var row in worksheet.RowsUsed().Skip(1))
         {
-            string categoriaNome = row.Cell(4).GetString() == string.Empty ? "Outros" : row.Cell(4).GetString();
-            long categoriaId = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? 4; // Categoria padrão "Outros"
+            // string categoriaNome = row.Cell(4).GetString() == string.Empty ? "Outros" : row.Cell(4).GetString();
+            // long categoriaId     = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? 0; // Categoria padrão "Outros"
 
             if (categoriaId == 0)
                 throw new Exception($"Categoria '{row.Cell(4).GetString()}' não encontrada e a categoria padrão 'Outros' também não existe.");

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using ClosedXML.Excel;
 using FinanceControl.Core.Domain.Enums;
+using System.Globalization;
 
 namespace FinanceControl.Core.Application.UseCases.Transacao;
 
@@ -94,7 +95,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         var transacao = new Domain.Entities.Transacao
         {
             Descricao = dto.Descricao,
-            DataEfetivacao =  DateTime.SpecifyKind(dto.DataEfetivacao, DateTimeKind.Utc),
+            DataEfetivacao = DateTime.SpecifyKind(dto.DataEfetivacao, DateTimeKind.Utc),
             Valor = Math.Abs(dto.Valor),
             ContaBancariaId = dto.ContaBancariaId,
             CategoriaId = dto.CategoriaId,
@@ -154,7 +155,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         foreach (var row in worksheet.RowsUsed().Skip(1))
         {
             string categoriaNome = row.Cell(4).GetString();
-            long? categoriaId     = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? _categoriaTransacaoRepository.GetByNomeAsync("Outros").Result?.Id;
+            long? categoriaId = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? _categoriaTransacaoRepository.GetByNomeAsync("Outros").Result?.Id;
 
             if (categoriaId == null)
             {
@@ -174,7 +175,11 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             {
                 DataEfetivacao = row.Cell(1).GetDateTime(),
                 Descricao = row.Cell(2).GetString(),
-                Valor = row.Cell(3).GetValue<decimal>(),
+                Valor = decimal.TryParse(row.Cell(3).GetString().Replace("R$", "").Trim(),
+                                        System.Globalization.NumberStyles.Any,
+                                        CultureInfo.GetCultureInfo("pt-BR"),
+                                        out var parsed)
+                                        ? parsed : 0,
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
                 CategoriaId = (long)categoriaId

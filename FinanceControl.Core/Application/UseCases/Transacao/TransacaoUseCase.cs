@@ -170,13 +170,13 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 categoriaId = novaCategoria.Id;
             }
 
-            var valorStr = row.Cell(3).GetValue<string>(); // lê como texto
+            var valorStr = row.Cell(3).GetValue<string>();
             decimal valor;
 
             if (!decimal.TryParse(valorStr, NumberStyles.Any, new CultureInfo("pt-BR"), out valor))
                 throw new Exception($"Valor inválido na célula {row.Cell(3).Address}: {valorStr}");
 
-            transacoes.Add(new TransacaoCreateDto
+            TransacaoCreateDto transacao = new TransacaoCreateDto
             {
                 DataEfetivacao = row.Cell(1).GetDateTime(),
                 Descricao = row.Cell(2).GetString(),
@@ -184,13 +184,13 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
                 CategoriaId = (long)categoriaId
-            });
+            };
+            
+            transacoes.Add(transacao);
+
+            await AddAsync(transacao);
         }
 
-        foreach (var transacao in transacoes)
-            await AddAsync(transacao);
-
-        return transacoes.Count;
-
+        return worksheet.RowsUsed().Count() - 1;
     }
 }

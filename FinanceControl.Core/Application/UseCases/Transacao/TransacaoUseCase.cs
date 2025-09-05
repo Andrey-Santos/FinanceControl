@@ -170,16 +170,33 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 categoriaId = novaCategoria.Id;
             }
 
+            decimal valor = 0;
+
+            try
+            {
+                valor = row.Cell(3).GetValue<decimal>();
+            }
+            catch
+            {
+                // se não conseguir converter, tenta manualmente
+                var str = row.Cell(3).GetString().Replace("R$", "").Trim();
+
+                if (decimal.TryParse(str, 
+                    NumberStyles.Any, 
+                    CultureInfo.GetCultureInfo("pt-BR"), 
+                    out var parsed))
+                {
+                    valor = parsed;
+                }
+            }
+
+
             Console.WriteLine(row.Cell(4).GetString());
             transacoes.Add(new TransacaoCreateDto
             {
                 DataEfetivacao = row.Cell(1).GetDateTime(),
                 Descricao = row.Cell(2).GetString(),
-                Valor = decimal.TryParse(row.Cell(3).GetString().Replace("R$", "").Trim(),
-                                        System.Globalization.NumberStyles.Any,
-                                        CultureInfo.GetCultureInfo("pt-BR"),
-                                        out var parsed)
-                                        ? parsed : 0,
+                Valor = valor,
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
                 CategoriaId = (long)categoriaId

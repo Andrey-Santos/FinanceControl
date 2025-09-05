@@ -18,6 +18,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using FinanceControl.Core.Application.UseCases.ContaPagarReceber;
 using Financecontrol.WebApi.Filters;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -139,6 +140,17 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+
+var culture = new CultureInfo("pt-BR");
+
+// Define a cultura padrão da thread
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+// Também define a cultura global (importante em APIs)
+CultureInfo.CurrentCulture = culture;
+CultureInfo.CurrentUICulture = culture;
+
 // 🧭 Middlewares
 app.UseCors("AllowAll");
 
@@ -167,4 +179,4 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-app.Run();
+    app.Run();

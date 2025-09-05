@@ -87,12 +87,14 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     public async Task<long> AddAsync(TransacaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
-        await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
+
+        if ((int)dto.CategoriaId != 0)
+            await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
 
         var transacao = new Domain.Entities.Transacao
         {
             Descricao = dto.Descricao,
-            DataEfetivacao = dto.DataEfetivacao,
+            DataEfetivacao =  DateTime.SpecifyKind(dto.DataEfetivacao, DateTimeKind.Utc),
             Valor = Math.Abs(dto.Valor),
             ContaBancariaId = dto.ContaBancariaId,
             CategoriaId = dto.CategoriaId,
@@ -151,11 +153,21 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         foreach (var row in worksheet.RowsUsed().Skip(1))
         {
-            // string categoriaNome = row.Cell(4).GetString() == string.Empty ? "Outros" : row.Cell(4).GetString();
-            // long categoriaId     = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? 0; // Categoria padrão "Outros"
+            string categoriaNome = row.Cell(4).GetString();
+            long? categoriaId     = _categoriaTransacaoRepository.GetByNomeAsync(categoriaNome).Result?.Id ?? _categoriaTransacaoRepository.GetByNomeAsync("Outros").Result?.Id;
 
-            // if (categoriaId == 0)
-            //     throw new Exception($"Categoria '{row.Cell(4).GetString()}' não encontrada e a categoria padrão 'Outros' também não existe.");
+            if (categoriaId == null)
+            {
+                var novaCategoria = new Domain.Entities.CategoriaTransacao
+                {
+                    Nome = "Outros",
+                    DataCadastro = DateTime.UtcNow,
+                    DataAlteracao = DateTime.UtcNow
+                };
+                await _categoriaTransacaoRepository.AddAsync(novaCategoria);
+                await _unitOfWork.CommitAsync();
+                categoriaId = novaCategoria.Id;
+            }
 
             Console.WriteLine(row.Cell(4).GetString());
             transacoes.Add(new TransacaoCreateDto
@@ -165,7 +177,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 Valor = row.Cell(3).GetValue<decimal>(),
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
-                // CategoriaId = categoriaId
+                CategoriaId = (long)categoriaId
             });
         }
 

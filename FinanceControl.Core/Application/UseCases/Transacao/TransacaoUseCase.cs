@@ -170,12 +170,17 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 categoriaId = novaCategoria.Id;
             }
 
-            Console.WriteLine(row.Cell(4).GetString());
+            var valorStr = row.Cell(3).GetValue<string>(); // lê como texto
+            decimal valor;
+
+            if (!decimal.TryParse(valorStr, NumberStyles.Any, new CultureInfo("pt-BR"), out valor))
+                throw new Exception($"Valor inválido na célula {row.Cell(3).Address}: {valorStr}");
+
             transacoes.Add(new TransacaoCreateDto
             {
                 DataEfetivacao = row.Cell(1).GetDateTime(),
                 Descricao = row.Cell(2).GetString(),
-                Valor = (decimal)row.Cell(3).GetDouble(),
+                Valor = valor,
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
                 CategoriaId = (long)categoriaId

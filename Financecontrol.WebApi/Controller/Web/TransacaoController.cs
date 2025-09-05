@@ -34,7 +34,10 @@ public class TransacaoController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        return View(await _useCase.GetAllAsync());
+        var result = await _useCase.GetAllAsync();
+        return View(result = result
+                    .OrderByDescending(t => t.DataEfetivacao)
+                    .ThenByDescending(t => t.Id));
     }
 
     [HttpGet]

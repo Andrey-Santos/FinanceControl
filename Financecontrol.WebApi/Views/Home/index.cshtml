@@ -166,10 +166,10 @@
         new Chart(document.getElementById('graficoDespesas'), {
             type: 'pie',
             data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasLabels)),
+                labels: @Html.Raw(Json.Serialize(ViewBag.GraficoDespesasLabels)),
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(ViewBag.GraficoDespesasValores)),
-                    backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
+                    backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoDespesasCores))
                     }]
             },
             options: optionsPadrao
@@ -179,10 +179,10 @@
         new Chart(document.getElementById('graficoReceitas'), {
             type: 'pie',
             data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasLabels)),
+                labels: @Html.Raw(Json.Serialize(ViewBag.GraficoReceitasLabels)),
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(ViewBag.GraficoReceitasValores)),
-                    backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
+                    backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoReceitasCores))
                     }]
             },
             options: optionsPadrao

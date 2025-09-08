@@ -23,7 +23,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         _contaBancariaRepository = contaBancariaRepository;
     }
 
-    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual)
+    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual, long usuarioId)
     {
         var query = _repository.GetAll();
 
@@ -32,6 +32,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         query = query.Where(t => t.DataEfetivacao >= inicioMesAtual);
         query = query.Where(t => t.DataEfetivacao <= fimMesAtual);
+        query = query.Where(t => t.ContaBancaria.UsuarioId == usuarioId);
 
         var transacoes = await query
             .AsNoTracking()
@@ -142,7 +143,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         IEnumerable<(string Categoria, decimal Valor)> receitas,
         decimal saldoAtual,
         decimal saldoMesAnterior,
-        decimal saldoPrevistoProximoMes)> GetResumoDashboardAsync(int mesAtual, int anoAtual)
+        decimal saldoPrevistoProximoMes)> GetResumoDashboardAsync(int mesAtual, int anoAtual, long usuarioId)
     {
         var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
         var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
@@ -152,15 +153,16 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         var baseQuery = _repository
             .GetAll()
             .AsNoTracking()
-            .Select(t => new
+            .Select(t => new    
             {
                 t.DataEfetivacao,
                 t.Valor,
                 t.Tipo,
-                CategoriaNome = t.Categoria.Nome
+                CategoriaNome = t.Categoria.Nome,
+                t.ContaBancaria.UsuarioId
             });
 
-        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual);
+        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual && t.UsuarioId == usuarioId);
 
         var categoriasQuery = mesQuery
             .GroupBy(t => t.CategoriaNome)
@@ -194,15 +196,15 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         var receitas = await receitasQuery.ToListAsync();
 
         var saldoAtual = await baseQuery
-            .Where(t => t.DataEfetivacao <= fimMesAtual)
+            .Where(t => t.UsuarioId == usuarioId && t.DataEfetivacao <= fimMesAtual)
             .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
         var saldoMesAnterior = await baseQuery
-            .Where(t => t.DataEfetivacao <= fimMesAnterior)
+            .Where(t => t.UsuarioId == usuarioId && t.DataEfetivacao <= fimMesAnterior)
             .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
         var saldoPrevistoProximoMes = await baseQuery
-            .Where(t => t.DataEfetivacao <= fimProximoMes)
+            .Where(t => t.UsuarioId == usuarioId && t.DataEfetivacao <= fimProximoMes)
             .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
         return (

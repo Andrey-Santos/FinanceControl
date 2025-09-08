@@ -18,11 +18,14 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int? mes, int? ano)
     {
-        var usuarioId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+        var usuarioIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+        if (string.IsNullOrEmpty(usuarioIdClaim) || !long.TryParse(usuarioIdClaim, out var usuarioId))
+            return RedirectToAction("Index", "Login");
+
         var mesAtual = mes ?? DateTime.Today.Month;
         var anoAtual = ano ?? DateTime.Today.Year;
 
-        var (categorias, despesas, receitas, saldoAtual, saldoMesAnterior, saldoPrevistoProximoMes) = await _transacaoUseCase.GetResumoDashboardAsync(mesAtual, anoAtual);
+        var (categorias, despesas, receitas, saldoAtual, saldoMesAnterior, saldoPrevistoProximoMes) = await _transacaoUseCase.GetResumoDashboardAsync(mesAtual, anoAtual, usuarioId);
 
         ViewBag.GraficoCategoriasLabels = categorias.Select(c => c.Categoria).ToList();
         ViewBag.GraficoCategoriasValores = categorias.Select(c => Math.Abs(c.Valor)).ToList();
@@ -47,7 +50,7 @@ public class HomeController : Controller
         ViewBag.AnoAtual = anoAtual;
 
         // Se ainda quiser listar transações, carregue só do mês:
-        var transacoesMes = await _transacaoUseCase.GetByFiltroAsync(mesAtual, anoAtual);
+        var transacoesMes = await _transacaoUseCase.GetByFiltroAsync(mesAtual, anoAtual, usuarioId);
         return View(transacoesMes.OrderByDescending(t => t.DataEfetivacao).ThenByDescending(t => t.Id));
     }
 }

@@ -14,9 +14,9 @@ public class TransacaoController : BaseController<Transacao, TransacaoCreateDto,
     }
 
     [HttpGet("PorMes")]
-    public async Task<IActionResult> GetPorMes(int mes, int ano)
+    public async Task<IActionResult> GetPorMes(int mes, int ano, long usuarioId)
     {
-        var result = await _useCase.GetByFiltroAsync(ano, mes);
+        var result = await _useCase.GetByFiltroAsync(ano, mes, usuarioId);
         return Ok(result);
     }
 

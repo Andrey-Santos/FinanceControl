@@ -23,15 +23,15 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         _contaBancariaRepository = contaBancariaRepository;
     }
 
-    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(DateTime? inicio, DateTime? fim)
+    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual)
     {
         var query = _repository.GetAll();
 
-        if (inicio.HasValue)
-            query = query.Where(t => t.DataEfetivacao >= inicio.Value);
+        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
+        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
 
-        if (fim.HasValue)
-            query = query.Where(t => t.DataEfetivacao <= fim.Value);
+        query = query.Where(t => t.DataEfetivacao >= inicioMesAtual);
+        query = query.Where(t => t.DataEfetivacao <= fimMesAtual);
 
         var transacoes = await query
             .AsNoTracking()
@@ -135,6 +135,84 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     {
         await _repository.DeleteAsync(id);
         await _unitOfWork.CommitAsync();
+    }
+
+    public async Task<(IEnumerable<(string Categoria, decimal Valor)> categorias,
+        IEnumerable<(string Categoria, decimal Valor)> despesas,
+        IEnumerable<(string Categoria, decimal Valor)> receitas,
+        decimal saldoAtual,
+        decimal saldoMesAnterior,
+        decimal saldoPrevistoProximoMes)> GetResumoDashboardAsync(int mesAtual, int anoAtual)
+    {
+        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
+        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
+        var fimMesAnterior = inicioMesAtual.AddDays(-1);
+        var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
+
+        var baseQuery = _repository
+            .GetAll()
+            .AsNoTracking()
+            .Select(t => new
+            {
+                t.DataEfetivacao,
+                t.Valor,
+                t.Tipo,
+                CategoriaNome = t.Categoria.Nome
+            });
+
+        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual);
+
+        var categoriasQuery = mesQuery
+            .GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor)
+            })
+            .Where(x => x.Valor != 0);
+
+        var despesasQuery = mesQuery
+            .GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Despesa ? t.Valor : 0)
+            })
+            .Where(x => x.Valor != 0);
+
+        var receitasQuery = mesQuery
+            .GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : 0)
+            })
+            .Where(x => x.Valor != 0);
+
+        var categorias = await categoriasQuery.ToListAsync();
+        var despesas = await despesasQuery.ToListAsync();
+        var receitas = await receitasQuery.ToListAsync();
+
+        var saldoAtual = await baseQuery
+            .Where(t => t.DataEfetivacao <= fimMesAtual)
+            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+        var saldoMesAnterior = await baseQuery
+            .Where(t => t.DataEfetivacao <= fimMesAnterior)
+            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+        var saldoPrevistoProximoMes = await baseQuery
+            .Where(t => t.DataEfetivacao <= fimProximoMes)
+            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+        return (
+            categorias.Select(x => (x.Categoria, x.Valor)),
+            despesas.Select(x => (x.Categoria, x.Valor)),
+            receitas.Select(x => (x.Categoria, x.Valor)),
+            saldoAtual,
+            saldoMesAnterior,
+            saldoPrevistoProximoMes
+        );
     }
 
     public async Task<int> ImportarAsync(IFormFile arquivo, long contaBancariaId)

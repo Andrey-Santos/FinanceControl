@@ -74,9 +74,9 @@ public class HomeController : Controller
         ViewBag.GraficoDespesasCores = despesas.Select((c, i) => coresDespesas[i % coresDespesas.Length]).ToList();
 
         ViewBag.GraficoReceitasLabels = receitas.Select(c => c.Categoria).ToList();
-        ViewBag.GraficoReceitasValores = despesas.Select(c => Math.Abs(c.Valor)).ToList();
+        ViewBag.GraficoReceitasValores = receitas.Select(c => Math.Abs(c.Valor)).ToList();
         var coresReceitas = new[] { "#007bff", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#20c997", "#fd7e14", "#17a2b8", "#343a40", "#6610f2" };
-        ViewBag.GraficoReceitasCores = despesas.Select((c, i) => coresReceitas[i % coresReceitas.Length]).ToList();
+        ViewBag.GraficoReceitasCores = receitas.Select((c, i) => coresReceitas[i % coresReceitas.Length]).ToList();
 
         ViewBag.SaldoAtual = transacoes
                                 .Where(t => t.DataEfetivacao <= inicioMesAtual.AddMonths(1).AddDays(-1))

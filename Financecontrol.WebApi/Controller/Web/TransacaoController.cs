@@ -10,7 +10,6 @@ namespace Financecontrol.WebApi.Controllers.Web;
 public class TransacaoController : Controller
 {
     private readonly TransacaoUseCase _useCase;
-
     private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
 
@@ -56,7 +55,7 @@ public class TransacaoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TransacaoCreateDto dto)
+    public async Task<IActionResult> Create(TransacaoCreateDto dto, bool continuar = false)
     {
         if (!ModelState.IsValid)
         {
@@ -65,7 +64,14 @@ public class TransacaoController : Controller
         }
 
         await _useCase.AddAsync(dto);
-        return RedirectToAction("Index");
+
+        if (continuar)
+        {
+            TempData["MensagemSucesso"] = "Transação adicionada com sucesso!";
+            return RedirectToAction("Create", new { tipo = dto.Tipo });
+        }
+        else
+            return RedirectToAction("Index");
     }
 
     [HttpGet]

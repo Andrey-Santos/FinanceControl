@@ -15,11 +15,13 @@
             int anoProximo = mesAtual == 12 ? anoAtual + 1 : anoAtual;
             string nomeMesAtual = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mesAtual);
         }
-        <a href="?mes=@mesAnterior&ano=@anoAnterior" class="btn btn-outline-secondary rounded-circle px-3 py-2" title="Mês anterior">
+        <a href="?mes=@mesAnterior&ano=@anoAnterior" class="btn btn-outline-secondary rounded-circle px-3 py-2"
+            title="Mês anterior">
             <i class="bi bi-chevron-left"></i>
         </a>
         <span class="fs-4 fw-bold text-white">@nomeMesAtual @anoAtual</span>
-        <a href="?mes=@mesProximo&ano=@anoProximo" class="btn btn-outline-secondary rounded-circle px-3 py-2" title="Próximo mês">
+        <a href="?mes=@mesProximo&ano=@anoProximo" class="btn btn-outline-secondary rounded-circle px-3 py-2"
+            title="Próximo mês">
             <i class="bi bi-chevron-right"></i>
         </a>
     </div>
@@ -52,6 +54,14 @@
     </div>
 </div>
 
+<div class="col-md-12 mb-3 d-flex justify-content-end gap-2">
+    <a asp-controller="Transacao" asp-action="Create" asp-route-tipo="Receita" class="btn btn-success btn-lg shadow-sm">
+        <i class="bi bi-plus-circle me-2"></i> Receita
+    </a>
+    <a asp-controller="Transacao" asp-action="Create" asp-route-tipo="Despesa" class="btn btn-danger btn-lg shadow-sm">
+        <i class="bi bi-dash-circle me-2"></i> Despesa
+    </a>
+</div>
 <div class="row">
     <!-- Lista de transações -->
     <div class="col-md-6 mb-3">
@@ -73,7 +83,8 @@
                                 <tr>
                                     <td>@item.DataEfetivacao.ToString("dd/MM/yyyy")</td>
                                     <td>@item.Descricao</td>
-                                    <td class="@(item.Tipo == FinanceControl.Core.Domain.Enums.TipoTransacao.Receita ? "text-success" : "text-danger")">
+                                    <td
+                                        class="@(item.Tipo == FinanceControl.Core.Domain.Enums.TipoTransacao.Receita ? "text-success" : "text-danger")">
                                         @item.Valor.ToString("C")
                                     </td>
                                 </tr>
@@ -146,7 +157,7 @@
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasValores)),
                     backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
-                }]
+                    }]
             },
             options: optionsPadrao
         });
@@ -159,7 +170,7 @@
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(ViewBag.GraficoDespesasValores)),
                     backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
-                }]
+                    }]
             },
             options: optionsPadrao
         });
@@ -172,7 +183,7 @@
                 datasets: [{
                     data: @Html.Raw(Json.Serialize(ViewBag.GraficoReceitasValores)),
                     backgroundColor: @Html.Raw(Json.Serialize(ViewBag.GraficoCategoriasCores))
-                }]
+                    }]
             },
             options: optionsPadrao
         });

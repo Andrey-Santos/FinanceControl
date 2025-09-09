@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using FinanceControl.Core.Application.UseCases.Transacao;
 using FinanceControl.Core.Domain.Enums;
 using FinanceControl.Core.Domain.Entities;
+using System.Security.Claims;
 
 namespace FinanceControl.WebApi.Controllers;
 
@@ -18,7 +19,7 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int? mes, int? ano)
     {
-        var usuarioIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+         var usuarioIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(usuarioIdClaim) || !long.TryParse(usuarioIdClaim, out var usuarioId))
             return RedirectToAction("Index", "Login");
 

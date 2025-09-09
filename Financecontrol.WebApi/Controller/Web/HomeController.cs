@@ -19,8 +19,8 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int? mes, int? ano)
     {
-         var usuarioIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(usuarioIdClaim) || !long.TryParse(usuarioIdClaim, out var usuarioId))
+        var usuarioId = (long)HttpContext.Items["UserId"];
+        if (usuarioId == 0)
             return RedirectToAction("Index", "Login");
 
         var mesAtual = mes ?? DateTime.Today.Month;

@@ -1,5 +1,10 @@
 @{
     var titulo = ViewBag.Title ?? "FinanceControl";
+    string currentPath = Context.Request.Path.Value?.ToLower() ?? "/";
+    bool IsActive(string pathStartsWith)
+    {
+        return currentPath.StartsWith(pathStartsWith.ToLower());
+    }
 }
 
 <!DOCTYPE html>
@@ -20,29 +25,41 @@
 
     <!-- Cabeçalho -->
     <header>
-        <nav class="navbar navbar-dark bg-black px-4 shadow-sm container-fluid d-flex justify-content-between align-items-center">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-black shadow-sm">
+            <div class="container-fluid px-4">
+                <!-- Logo -->
+                <a class="navbar-brand fw-bold fs-4 text-white" href="/">FinanceControl</a>
 
-        <!-- Logo à esquerda -->
-        <a class="navbar-brand fw-bold fs-4 text-white ms-5" href="/">FinanceControl</a>
+                <!-- Toggler -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar" aria-controls="topNavbar" aria-expanded="false" aria-label="Alternar navegação">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-        <!-- Menu central -->
-        <div class="d-flex gap-3">
-            <a href="/Transacao" class="btn text-white btn-md">Transações</a>
-            <a href="/ContaPagarReceber" class="btn text-white btn-md">Contas a Pagar / Receber</a>
-            <a href="/Importacao" class="btn text-white btn-md">Importação</a>
-            <a href="/Configuracao" class="btn text-white btn-md">Configurações</a>
-        </div>
+                <!-- Links -->
+                <div class="collapse navbar-collapse" id="topNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @(IsActive("/transacao") ? "active" : "")" aria-current="@(IsActive("/transacao") ? "page" : null)" href="/Transacao">Transações</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(IsActive("/contapagarreceber") ? "active" : "")" aria-current="@(IsActive("/contapagarreceber") ? "page" : null)" href="/ContaPagarReceber">Contas a Pagar / Receber</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(IsActive("/importacao") ? "active" : "")" aria-current="@(IsActive("/importacao") ? "page" : null)" href="/Importacao">Importação</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(IsActive("/configuracao") ? "active" : "")" aria-current="@(IsActive("/configuracao") ? "page" : null)" href="/Configuracao">Configurações</a>
+                        </li>
+                    </ul>
 
-        <!-- Usuário + Sair à direita -->
-        <div class="d-flex align-items-center gap-3">
-            <span class="bg-black px-3 py-2 rounded text-white small">
-                Olá, @User.Identity?.Name
-            </span>
-            <a href="/Login/Logout" class="btn btn-outline-light btn-sm">Sair</a>
-        </div>
-
-</nav>
-
+                    <!-- Usuário + Sair -->
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-white-50 small">Olá, @User.Identity?.Name</span>
+                        <a href="/Login/Logout" class="btn btn-outline-light btn-sm">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
     </header>
 
     <!-- Conteúdo principal -->

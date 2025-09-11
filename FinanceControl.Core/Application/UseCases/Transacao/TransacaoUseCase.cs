@@ -45,7 +45,11 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             Valor = t.Valor,
             DataEfetivacao = t.DataEfetivacao,
             Tipo = t.Tipo,
-            ContaBancariaId = t.ContaBancariaId
+            ContaBancariaId = t.ContaBancariaId,
+            TipoOperacao = t.TipoOperacao,
+            Observacao = t.Observacao,
+            CartaoId = t.CartaoId,
+            FaturaId = t.FaturaId
         });
     }
 
@@ -67,7 +71,11 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             CategoriaId = u.CategoriaId,
             ContaBancariaNumero = u.ContaBancaria.Numero,
             CategoriaNome = u.Categoria.Nome,
-            Tipo = u.Tipo
+            Tipo = u.Tipo,
+            TipoOperacao = u.TipoOperacao,
+            Observacao = u.Observacao,
+            CartaoId = u.CartaoId,
+            FaturaId = u.FaturaId
         });
     }
 
@@ -82,7 +90,11 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             DataEfetivacao = Transacao.DataEfetivacao,
             ContaBancariaId = Transacao.ContaBancariaId,
             CategoriaId = Transacao.CategoriaId,
-            Tipo = Transacao.Tipo
+            Tipo = Transacao.Tipo,
+            TipoOperacao = Transacao.TipoOperacao,
+            Observacao = Transacao.Observacao,
+            CartaoId = Transacao.CartaoId,
+            FaturaId = Transacao.FaturaId
         };
     }
 
@@ -101,6 +113,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             ContaBancariaId = dto.ContaBancariaId,
             CategoriaId = dto.CategoriaId,
             Tipo = dto.Tipo,
+            TipoOperacao = dto.TipoOperacao,
+            Observacao = dto.Observacao,
+            CartaoId = dto.CartaoId,
+            FaturaId = dto.FaturaId,
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
         };
@@ -127,7 +143,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         Transacao.ContaBancariaId = dto.ContaBancariaId;
         Transacao.CategoriaId = dto.CategoriaId;
         Transacao.Tipo = dto.Tipo;
-
+        Transacao.TipoOperacao = dto.TipoOperacao;
+        Transacao.Observacao = dto.Observacao;
+        Transacao.CartaoId = dto.CartaoId;
+        Transacao.FaturaId = dto.FaturaId;
         await _repository.UpdateAsync(Transacao);
         await _unitOfWork.CommitAsync();
     }
@@ -158,11 +177,15 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 t.DataEfetivacao,
                 t.Valor,
                 t.Tipo,
+                t.TipoOperacao,
+                t.Observacao,
                 CategoriaNome = t.Categoria.Nome,
-                t.ContaBancaria.UsuarioId
+                t.ContaBancaria.UsuarioId,
+                t.CartaoId,
+                t.FaturaId
             });
 
-        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual && t.UsuarioId == usuarioId);
+        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual && t.UsuarioId == usuarioId && t.TipoOperacao == TipoOperacao.Debito);
 
         var categoriasQuery = mesQuery
             .GroupBy(t => t.CategoriaNome)
@@ -263,7 +286,8 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 Valor = valor,
                 ContaBancariaId = contaBancariaId,
                 Tipo = row.Cell(3).GetValue<decimal>() < 0 ? TipoTransacao.Despesa : TipoTransacao.Receita,
-                CategoriaId = (long)categoriaId
+                CategoriaId = (long)categoriaId,
+                TipoOperacao = TipoOperacao.Debito,
             };
             
             transacoes.Add(transacao);

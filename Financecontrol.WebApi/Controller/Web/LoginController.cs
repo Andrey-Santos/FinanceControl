@@ -44,8 +44,8 @@ public class LoginController : Controller
         client.BaseAddress = new Uri($"{Request.Scheme}://{Request.Host.Value}");
         var response = await client.PostAsJsonAsync("/api/Auth/create", dto);
 
-        // if (response.IsSuccessStatusCode)
-        //     return RedirectToAction("Index");
+        if (response.IsSuccessStatusCode)
+            return RedirectToAction("Index");
 
         TempData["Erro"] = await response.Content.ReadAsStringAsync();
         return View(dto);

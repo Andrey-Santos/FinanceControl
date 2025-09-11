@@ -19,6 +19,7 @@
                 <th>ID</th>
                 <th>Banco</th>
                 <th>Conta</th>
+                <th>Saldo Atual</th>
             </tr>
         </thead>
         <tbody>
@@ -28,6 +29,7 @@
                     <td>@conta.Id</td>
                     <td>@conta.BancoNome</td>
                     <td>@conta.Numero</td>
+                    <td>@conta.SaldoAtual.ToString("C")</td>
                 </tr>
             }
         </tbody>

@@ -9,7 +9,11 @@ public class TransacaoResponseDto : DtoResponse
     public DateTime DataEfetivacao { get; set; }
     public long ContaBancariaId { get; set; }
     public long CategoriaId { get; set; }
+    public long? CartaoId { get; set; }
+    public long? FaturaId { get; set; }
     public string ContaBancariaNumero { get; set; } = string.Empty;
     public string CategoriaNome { get; set; } = string.Empty;
     public TipoTransacao Tipo { get; set; }
+    public TipoOperacao TipoOperacao { get; set; }
+    public string? Observacao { get; set; }
 }

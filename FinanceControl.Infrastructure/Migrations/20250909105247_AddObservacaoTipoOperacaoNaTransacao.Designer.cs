@@ -3,6 +3,7 @@ using System;
 using FinanceControl.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FinanceControl.Infrastructure.Migrations
 {
     [DbContext(typeof(FinanceDbContext))]
-    partial class FinanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250909105247_AddObservacaoTipoOperacaoNaTransacao")]
+    partial class AddObservacaoTipoOperacaoNaTransacao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,9 +232,6 @@ namespace FinanceControl.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("CartaoId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("CategoriaId")
                         .HasColumnType("bigint");
 
@@ -251,9 +251,6 @@ namespace FinanceControl.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long?>("FaturaId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Observacao")
                         .HasColumnType("text");
 
@@ -268,13 +265,9 @@ namespace FinanceControl.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CartaoId");
-
                     b.HasIndex("CategoriaId");
 
                     b.HasIndex("ContaBancariaId");
-
-                    b.HasIndex("FaturaId");
 
                     b.ToTable("Transacoes");
                 });
@@ -378,10 +371,6 @@ namespace FinanceControl.Infrastructure.Migrations
 
             modelBuilder.Entity("FinanceControl.Core.Domain.Entities.Transacao", b =>
                 {
-                    b.HasOne("FinanceControl.Core.Domain.Entities.Cartao", "Cartao")
-                        .WithMany()
-                        .HasForeignKey("CartaoId");
-
                     b.HasOne("FinanceControl.Core.Domain.Entities.CategoriaTransacao", "Categoria")
                         .WithMany("Transacoes")
                         .HasForeignKey("CategoriaId")
@@ -394,17 +383,9 @@ namespace FinanceControl.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FinanceControl.Core.Domain.Entities.Fatura", "Fatura")
-                        .WithMany()
-                        .HasForeignKey("FaturaId");
-
-                    b.Navigation("Cartao");
-
                     b.Navigation("Categoria");
 
                     b.Navigation("ContaBancaria");
-
-                    b.Navigation("Fatura");
                 });
 
             modelBuilder.Entity("FinanceControl.Core.Domain.Entities.Banco", b =>

@@ -19,14 +19,21 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(int? mes, int? ano)
     {
-        var usuarioId = (long)HttpContext.Items["UserId"];
-        if (usuarioId == 0)
+        var userIdObj = HttpContext.Items["UserId"];
+        if (userIdObj is not long usuarioId || usuarioId == 0)
             return RedirectToAction("Index", "Login");
 
         var mesAtual = mes ?? DateTime.Today.Month;
         var anoAtual = ano ?? DateTime.Today.Year;
 
-        var (categorias, despesas, receitas, saldoAtual, saldoMesAnterior, saldoPrevistoProximoMes) = await _transacaoUseCase.GetResumoDashboardAsync(mesAtual, anoAtual, usuarioId);
+        await OnLoad(mesAtual, anoAtual, usuarioId);
+
+        return View(ViewBag.TransacoesMes );
+    }
+
+    public async Task OnLoad(int mes, int ano, long usuarioId)
+    {
+        var (categorias, despesas, receitas, saldoAtual, saldoMesAnterior, saldoPrevistoProximoMes) = await _transacaoUseCase.GetResumoDashboardAsync(mes, ano, usuarioId);
 
         ViewBag.GraficoCategoriasLabels = categorias.Select(c => c.Categoria).ToList();
         ViewBag.GraficoCategoriasValores = categorias.Select(c => Math.Abs(c.Valor)).ToList();
@@ -47,11 +54,10 @@ public class HomeController : Controller
         ViewBag.SaldoMesAnterior = saldoMesAnterior;
         ViewBag.SaldoPrevistoProximoMes = saldoPrevistoProximoMes;
 
-        ViewBag.MesAtual = mesAtual;
-        ViewBag.AnoAtual = anoAtual;
+        ViewBag.MesAtual = mes;
+        ViewBag.AnoAtual = ano;
 
-        // Se ainda quiser listar transações, carregue só do mês:
-        var transacoesMes = await _transacaoUseCase.GetByFiltroAsync(mesAtual, anoAtual, usuarioId);
-        return View(transacoesMes.OrderByDescending(t => t.DataEfetivacao).ThenByDescending(t => t.Id));
+        var transacoesMes = await _transacaoUseCase.GetByFiltroAsync(mes, ano, usuarioId);
+        ViewBag.TransacoesMes = transacoesMes.OrderByDescending(t => t.DataEfetivacao).ThenByDescending(t => t.Id);
     }
 }

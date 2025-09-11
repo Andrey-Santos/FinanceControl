@@ -12,20 +12,24 @@ public class TransacaoController : Controller
     private readonly TransacaoUseCase _useCase;
     private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
+    private readonly ICartaoRepository _cartaoRepository;
 
-    public TransacaoController(TransacaoUseCase useCase, IContaBancariaRepository contaBancariaRepository, ICategoriaTransacaoRepository categoriaTransacaoRepository)
+    public TransacaoController(TransacaoUseCase useCase, IContaBancariaRepository contaBancariaRepository, ICategoriaTransacaoRepository categoriaTransacaoRepository, ICartaoRepository cartaoRepository)
     {
         _useCase = useCase;
         _contaBancariaRepository = contaBancariaRepository;
         _categoriaTransacaoRepository = categoriaTransacaoRepository;
+        _cartaoRepository = cartaoRepository;
     }
 
     public async Task LoadLists()
     {
         var contas = await _contaBancariaRepository.GetAllAsync();
         var categorias = await _categoriaTransacaoRepository.GetAllAsync();
+        var cartoes = await _cartaoRepository.GetAllAsync();
 
         ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoTransacao)));
+        ViewBag.TiposOperacao = new SelectList(Enum.GetValues(typeof(TipoOperacao)));
         ViewBag.Categorias = new SelectList(categorias, "Id", "Nome");
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
     }
@@ -47,10 +51,22 @@ public class TransacaoController : Controller
         var model = new TransacaoCreateDto
         {
             Tipo = tipo ?? TipoTransacao.Despesa,
+            TipoOperacao = TipoOperacao.Debito,
             DataEfetivacao = DateTime.Now
         };
 
         return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CartoesPorConta(long contaBancariaId)
+    {
+        var cartoes = await _cartaoRepository.GetAllAsync();
+        var filtrados = cartoes
+            .Where(c => c.Tipo == TipoCartao.Credito && c.ContaBancariaId == contaBancariaId)
+            .Select(c => new { id = c.Id, nome = c.Apelido })
+            .ToList();
+        return Json(filtrados);
     }
 
     [HttpPost]

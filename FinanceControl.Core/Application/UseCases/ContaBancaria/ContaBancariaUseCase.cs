@@ -24,6 +24,7 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
         var contas = await _repository
             .GetAll()
             .Include(c => c.Banco)
+            .Include(c => c.Transacoes)
             .ToListAsync();
 
         return contas.Select(c => new ContaBancariaResponseDto
@@ -33,6 +34,7 @@ public class ContaBancariaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Co
             BancoId = c.BancoId,
             UsuarioId = c.UsuarioId,
             BancoNome = c.Banco.Nome,
+            SaldoAtual = c.Transacoes.Sum(t => t.Tipo == Domain.Enums.TipoTransacao.Receita ? t.Valor : -t.Valor)
         });
     }
 

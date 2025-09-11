@@ -10,6 +10,12 @@ public class Transacao : EntityBase
     public long ContaBancariaId { get; set; }
     public long CategoriaId { get; set; }
     public TipoTransacao Tipo { get; set; }
+    public string? Observacao { get; set; }
+    public TipoOperacao TipoOperacao { get; set; }
+    public long? CartaoId { get; set; }
+    public long? FaturaId { get; set; }
     public ContaBancaria ContaBancaria { get; set; } = null!;
+    public Cartao? Cartao { get; set; }
     public CategoriaTransacao Categoria { get; set; } = null!;
+    public Fatura? Fatura { get; set; } = null;
 }

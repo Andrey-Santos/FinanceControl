@@ -7,5 +7,6 @@ public class ContaBancariaResponseDto : DtoResponse
     public long BancoId { get; set; }
     public string BancoNome { get; set; } = string.Empty;
     public long UsuarioId { get; set; }
+    public decimal SaldoAtual { get; set; }
 
 }

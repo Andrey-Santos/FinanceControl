@@ -13,15 +13,12 @@
 
     <!-- Filtros -->
     <div class="card mb-4 bg-dark border-secondary">
-        <div class="card-header bg-dark border-secondary">
+        <div class="card-header bg-dark border-secondary" id="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <h5 class="mb-0 text-light me-2">Filtros</h5>
                     <span class="badge bg-primary" id="filtrosBadge" style="display: none;">Ativo</span>
                 </div>
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleFiltros">
-                    <i class="fas fa-chevron-down" id="filtrosIcon"></i>
-                </button>
             </div>
         </div>
         <div class="card-body bg-dark" id="filtrosBody" style="display: none;">
@@ -139,14 +136,7 @@
             color: #ffffff !important;
         }
 
-        .form-select:focus {
-            background-color: #212529 !important;
-            color: #ffffff !important;
-            border-color: #6c757d !important;
-            box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
-        }
-
-        .form-control:focus {
+        .form-select:focus, .form-control:focus {
             background-color: #212529 !important;
             color: #ffffff !important;
             border-color: #6c757d !important;
@@ -212,12 +202,12 @@
         // Funcionalidade dos filtros
         document.addEventListener('DOMContentLoaded', function () {
             // Toggle dos filtros
-            const toggleFiltros = document.getElementById('toggleFiltros');
+            const filtrosHeader = document.getElementById('card-header');
             const filtrosBody = document.getElementById('filtrosBody');
             const filtrosIcon = document.getElementById('filtrosIcon');
             const filtrosBadge = document.getElementById('filtrosBadge');
 
-            toggleFiltros.addEventListener('click', function () {
+            filtrosHeader.addEventListener('click', function () {
                 if (filtrosBody.style.display === 'none' || filtrosBody.style.display === '') {
                     filtrosBody.style.display = 'block';
                     filtrosIcon.className = 'fas fa-chevron-up';

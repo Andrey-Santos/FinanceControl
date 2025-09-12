@@ -35,7 +35,7 @@
                     <span asp-validation-for="ContaBancariaId" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3" id="tipooperacao-group">
                     <label asp-for="TipoOperacao" class="form-label"></label>
                     <select asp-for="TipoOperacao" class="form-select"
                         asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoOperacao>()"></select>
@@ -126,8 +126,17 @@
             if (contaSelect && contaSelect.value) {
                 carregarCartoes(contaSelect.value);
             } else {
-                toggleCartao();
+                toggleTransacao();
             }
+        }
+
+        function toggleTransacao() {
+            var tipoTransacao = document.getElementById('Tipo');
+            var tipoOperacao = document.getElementById('tipooperacao-group');
+
+            tipoOperacao.style.display = tipoTransacao.value == @((int)FinanceControl.Core.Domain.Enums.TipoTransacao.Despesa) ? '' : 'none';
+
+            toggleCartao();
         }
 
         function toggleCartao() {
@@ -143,7 +152,7 @@
         }
 
         document.getElementById('TipoOperacao').addEventListener('change', toggleCartao);
-        document.getElementById('Tipo').addEventListener('change', toggleCartao);
+        document.getElementById('Tipo').addEventListener('change', toggleTransacao);
 
         var contaSelect = document.getElementById('ContaBancariaId');
         if (contaSelect) {

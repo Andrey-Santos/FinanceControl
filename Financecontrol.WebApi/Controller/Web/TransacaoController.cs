@@ -4,6 +4,7 @@ using FinanceControl.Core.Application.DTOs.Transacao;
 using FinanceControl.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using FinanceControl.Core.Domain.Enums;
+using FinanceControl.Core.Domain.Entities;
 
 namespace Financecontrol.WebApi.Controllers.Web;
 
@@ -22,25 +23,35 @@ public class TransacaoController : Controller
         _cartaoRepository = cartaoRepository;
     }
 
-    public async Task LoadLists()
+    public async Task LoadLists(TransacaoFilterDto? filtro = null)
     {
         var contas = await _contaBancariaRepository.GetAllAsync();
         var categorias = await _categoriaTransacaoRepository.GetAllAsync();
-        var cartoes = await _cartaoRepository.GetAllAsync();
 
-        ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoTransacao)));
-        ViewBag.TiposOperacao = new SelectList(Enum.GetValues(typeof(TipoOperacao)));
-        ViewBag.Categorias = new SelectList(categorias, "Id", "Nome");
-        ViewBag.Contas = new SelectList(contas, "Id", "Numero");
+        ViewBag.Tipos = new SelectList(Enum.GetValues<TipoTransacao>(), filtro.Tipo);
+        ViewBag.TiposOperacao = new SelectList(Enum.GetValues<TipoOperacao>(), filtro.TipoOperacao);
+        ViewBag.Categorias = new SelectList(categorias, "Id", "Nome", filtro.CategoriaId);
+        ViewBag.Contas = new SelectList(contas, "Id", "Numero", filtro.ContaBancariaId);
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(TransacaoFilterDto? filtro = null)
     {
+        await LoadLists(filtro);
+        
         var result = await _useCase.GetAllAsync();
-        return View(result = result
-                    .OrderByDescending(t => t.DataEfetivacao)
-                    .ThenByDescending(t => t.Id));
+        
+        if (filtro != null)
+        {
+            result = await _useCase.GetFilteredAsync(filtro);
+        }
+        
+        result = result
+            .OrderByDescending(t => t.DataEfetivacao)
+            .ThenByDescending(t => t.Id);
+            
+        ViewBag.Filtro = filtro ?? new TransacaoFilterDto();
+        return View(result);
     }
 
     [HttpGet]
@@ -84,7 +95,7 @@ public class TransacaoController : Controller
         if (continuar)
         {
             TempData["MensagemSucesso"] = "Transação adicionada com sucesso!";
-            return RedirectToAction("Create", new { tipo = dto.Tipo });
+            return RedirectToAction("Create", new { tipo = dto.Tipo, contaBancariaId = dto.ContaBancariaId, categoriaId = dto.CategoriaId});
         }
         else
             return RedirectToAction("Index");

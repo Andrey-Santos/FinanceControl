@@ -98,6 +98,79 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         };
     }
 
+    public async Task<IEnumerable<TransacaoResponseDto>> GetFilteredAsync(TransacaoFilterDto filtro)
+    {
+        var query = _repository
+            .GetAll()
+            .Include(t => t.ContaBancaria)
+            .Include(t => t.Categoria)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(filtro.Descricao))
+        {
+            query = query.Where(t => t.Descricao.Contains(filtro.Descricao));
+        }
+
+        if (filtro.ValorMinimo.HasValue)
+        {
+            query = query.Where(t => t.Valor >= filtro.ValorMinimo.Value);
+        }
+
+        if (filtro.ValorMaximo.HasValue)
+        {
+            query = query.Where(t => t.Valor <= filtro.ValorMaximo.Value);
+        }
+
+        if (filtro.DataInicio.HasValue)
+        {
+            query = query.Where(t => t.DataEfetivacao >= filtro.DataInicio.Value);
+        }
+
+        if (filtro.DataFim.HasValue)
+        {
+            query = query.Where(t => t.DataEfetivacao <= filtro.DataFim.Value);
+        }
+
+        if (filtro.Tipo.HasValue)
+        {
+            query = query.Where(t => t.Tipo == filtro.Tipo.Value);
+        }
+
+        if (filtro.TipoOperacao.HasValue)
+        {
+            query = query.Where(t => t.TipoOperacao == filtro.TipoOperacao.Value);
+        }
+
+        if (filtro.ContaBancariaId.HasValue)
+        {
+            query = query.Where(t => t.ContaBancariaId == filtro.ContaBancariaId.Value);
+        }
+
+        if (filtro.CategoriaId.HasValue)
+        {
+            query = query.Where(t => t.CategoriaId == filtro.CategoriaId.Value);
+        }
+
+        var transacoes = await query.ToListAsync();
+
+        return transacoes.Select(t => new TransacaoResponseDto
+        {
+            Id = t.Id,
+            Descricao = t.Descricao,
+            Valor = t.Valor,
+            DataEfetivacao = t.DataEfetivacao,
+            ContaBancariaId = t.ContaBancariaId,
+            CategoriaId = t.CategoriaId,
+            ContaBancariaNumero = t.ContaBancaria.Numero,
+            CategoriaNome = t.Categoria.Nome,
+            Tipo = t.Tipo,
+            TipoOperacao = t.TipoOperacao,
+            Observacao = t.Observacao,
+            CartaoId = t.CartaoId,
+            FaturaId = t.FaturaId
+        });
+    }
+
     public async Task<long> AddAsync(TransacaoCreateDto dto)
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");

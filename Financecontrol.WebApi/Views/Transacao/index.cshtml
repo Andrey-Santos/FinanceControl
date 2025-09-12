@@ -1,11 +1,97 @@
 @model IEnumerable<FinanceControl.Core.Application.DTOs.Transacao.TransacaoResponseDto>
+@using DocumentFormat.OpenXml.Wordprocessing
+@using FinanceControl.Core.Application.DTOs.Transacao
+@using FinanceControl.Core.Domain.Enums
 
 @{
     ViewData["Title"] = "Transações";
+    var filtro = ViewBag.Filtro as TransacaoFilterDto ?? new TransacaoFilterDto();
 }
 
 <div class="container mt-4">
     <h2 class="mb-4">Transações</h2>
+
+    <!-- Filtros -->
+    <div class="card mb-4 bg-dark border-secondary">
+        <div class="card-header bg-dark border-secondary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 text-light me-2">Filtros</h5>
+                    <span class="badge bg-primary" id="filtrosBadge" style="display: none;">Ativo</span>
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleFiltros">
+                    <i class="fas fa-chevron-down" id="filtrosIcon"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body bg-dark" id="filtrosBody" style="display: none;">
+            <form method="get" id="filtroForm">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="Descricao" class="form-label text-light">Descrição</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="Descricao"
+                            name="Descricao" value="@filtro.Descricao" placeholder="Buscar por descrição">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ValorMinimo" class="form-label text-light">Valor Mínimo</label>
+                        <input type="number" class="form-control bg-dark text-light border-secondary" id="ValorMinimo"
+                            name="ValorMinimo" value="@filtro.ValorMinimo" step="0.01" placeholder="0,00">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ValorMaximo" class="form-label text-light">Valor Máximo</label>
+                        <input type="number" class="form-control bg-dark text-light border-secondary" id="ValorMaximo"
+                            name="ValorMaximo" value="@filtro.ValorMaximo" step="0.01" placeholder="0,00">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="DataInicio" class="form-label text-light">Data Início</label>
+                        <input type="date" class="form-control bg-dark text-light border-secondary" id="DataInicio"
+                            name="DataInicio" value="@(filtro.DataInicio?.ToString("yyyy-MM-dd"))">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="DataFim" class="form-label text-light">Data Fim</label>
+                        <input type="date" class="form-control bg-dark text-light border-secondary" id="DataFim"
+                            name="DataFim" value="@(filtro.DataFim?.ToString("yyyy-MM-dd"))">
+                    </div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-2">
+                        <label for="Tipo" class="form-label text-light">Tipo</label>
+                        <select asp-items="ViewBag.Tipos" class="form-select bg-dark text-light border-secondary"
+                            id="Tipo" name="Tipo">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="TipoOperacao" class="form-label text-light">Tipo Operação</label>
+                        <select asp-items="ViewBag.TiposOperacao"
+                            class="form-select bg-dark text-light border-secondary" id="TipoOperacao"
+                            name="TipoOperacao">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ContaBancariaId" class="form-label text-light">Conta Bancária</label>
+                        <select asp-items="ViewBag.ContaBancariaId"
+                            class="form-select bg-dark text-light border-secondary" id="ContaBancariaId"
+                            name="ContaBancariaId">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="CategoriaId" class="form-label text-light">Categoria</label>
+                        <select asp-items="ViewBag.Categorias" class="form-select bg-dark text-light border-secondary"
+                            id="CategoriaId" name="CategoriaId">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">Limpar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="d-flex gap-2 mb-3">
         <a asp-action="Create" class="btn btn-success">Adicionar</a>
@@ -34,7 +120,7 @@
                     <td>@t.Valor.ToString("C")</td>
                     <td>@t.DataEfetivacao</td>
                     <td>@t.Tipo</td>
-                    <td>@t.ContaBancariaNumero</td> 
+                    <td>@t.ContaBancariaNumero</td>
                     <td>@t.CategoriaNome</td>
                 </tr>
             }
@@ -47,9 +133,48 @@
 </form>
 
 @section Scripts {
+    <style>
+        .form-select option {
+            background-color: #212529 !important;
+            color: #ffffff !important;
+        }
+
+        .form-select:focus {
+            background-color: #212529 !important;
+            color: #ffffff !important;
+            border-color: #6c757d !important;
+            box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
+        }
+
+        .form-control:focus {
+            background-color: #212529 !important;
+            color: #ffffff !important;
+            border-color: #6c757d !important;
+            box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
+        }
+
+        .form-control::placeholder {
+            color: #6c757d !important;
+        }
+
+        #filtrosBody {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-header {
+            cursor: pointer;
+        }
+
+        .card-header:hover {
+            background-color: #343a40 !important;
+        }
+    </style>
     <script>
         let transacaoSelecionadaId = null;
 
+        // Funcionalidade de seleção de linhas
         document.querySelectorAll("#tabelaTransacoes tbody tr").forEach(row => {
             row.addEventListener("click", () => {
                 document.querySelectorAll("#tabelaTransacoes tbody tr")
@@ -63,6 +188,7 @@
             });
         });
 
+        // Botões de ação
         document.getElementById("btnEditar").addEventListener("click", () => {
             if (transacaoSelecionadaId) {
                 window.location.href = `/Transacao/Edit/${transacaoSelecionadaId}`;
@@ -81,6 +207,118 @@
                 document.body.appendChild(form);
                 form.submit();
             }
-        }); 
+        });
+
+        // Funcionalidade dos filtros
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle dos filtros
+            const toggleFiltros = document.getElementById('toggleFiltros');
+            const filtrosBody = document.getElementById('filtrosBody');
+            const filtrosIcon = document.getElementById('filtrosIcon');
+            const filtrosBadge = document.getElementById('filtrosBadge');
+
+            toggleFiltros.addEventListener('click', function () {
+                if (filtrosBody.style.display === 'none' || filtrosBody.style.display === '') {
+                    filtrosBody.style.display = 'block';
+                    filtrosIcon.className = 'fas fa-chevron-up';
+                    filtrosBody.style.opacity = '0';
+                    filtrosBody.style.transform = 'translateY(-10px)';
+
+                    setTimeout(() => {
+                        filtrosBody.style.opacity = '1';
+                        filtrosBody.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    filtrosBody.style.opacity = '0';
+                    filtrosBody.style.transform = 'translateY(-10px)';
+
+                    setTimeout(() => {
+                        filtrosBody.style.display = 'none';
+                        filtrosIcon.className = 'fas fa-chevron-down';
+                    }, 300);
+                }
+            });
+
+            // Expandir automaticamente se houver filtros aplicados
+            const hasActiveFilters = @(filtro.Descricao != null || filtro.ValorMinimo.HasValue || filtro.ValorMaximo.HasValue || filtro.DataInicio.HasValue || filtro.DataFim.HasValue || filtro.Tipo.HasValue || filtro.TipoOperacao.HasValue || filtro.ContaBancariaId.HasValue || filtro.CategoriaId.HasValue ? "true" : "false");
+            if (hasActiveFilters) {
+                filtrosBody.style.display = 'block';
+                filtrosIcon.className = 'fas fa-chevron-up';
+                filtrosBadge.style.display = 'inline-block';
+            }
+
+            // Validação de datas
+            const dataInicio = document.getElementById('DataInicio');
+            const dataFim = document.getElementById('DataFim');
+
+            dataInicio.addEventListener('change', function () {
+                if (dataFim.value && this.value > dataFim.value) {
+                    dataFim.value = this.value;
+                }
+            });
+
+            dataFim.addEventListener('change', function () {
+                if (dataInicio.value && this.value < dataInicio.value) {
+                    this.value = dataInicio.value;
+                }
+            });
+
+            // Validação de valores
+            const valorMinimo = document.getElementById('ValorMinimo');
+            const valorMaximo = document.getElementById('ValorMaximo');
+
+            valorMinimo.addEventListener('change', function () {
+                if (valorMaximo.value && parseFloat(this.value) > parseFloat(valorMaximo.value)) {
+                    valorMaximo.value = this.value;
+                }
+            });
+
+            valorMaximo.addEventListener('change', function () {
+                if (valorMinimo.value && parseFloat(this.value) < parseFloat(valorMinimo.value)) {
+                    this.value = valorMinimo.value;
+                }
+            });
+
+            // Auto-submit do formulário ao pressionar Enter
+            document.getElementById('filtroForm').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.submit();
+                }
+            });
+
+            // Limpar filtros
+            document.querySelector('a[href*="Index"]').addEventListener('click', function (e) {
+                if (this.textContent.trim() === 'Limpar') {
+                    e.preventDefault();
+                    document.getElementById('filtroForm').reset();
+                    window.location.href = this.href;
+                }
+            });
+
+            // Função para verificar se há filtros ativos
+            function checkActiveFilters() {
+                const form = document.getElementById('filtroForm');
+                const formData = new FormData(form);
+                let hasActive = false;
+
+                for (let [key, value] of formData.entries()) {
+                    if (value && value.trim() !== '') {
+                        hasActive = true;
+                        break;
+                    }
+                }
+
+                if (hasActive) {
+                    filtrosBadge.style.display = 'inline-block';
+                } else {
+                    filtrosBadge.style.display = 'none';
+                }
+            }
+
+            // Verificar filtros ativos quando o formulário é alterado
+            document.getElementById('filtroForm').addEventListener('change', checkActiveFilters);
+            document.getElementById('filtroForm').addEventListener('input', checkActiveFilters);
+        });
     </script>
 }

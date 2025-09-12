@@ -28,10 +28,10 @@ public class TransacaoController : Controller
         var contas = await _contaBancariaRepository.GetAllAsync();
         var categorias = await _categoriaTransacaoRepository.GetAllAsync();
 
-        ViewBag.Tipos = new SelectList(Enum.GetValues<TipoTransacao>(), filtro.Tipo);
-        ViewBag.TiposOperacao = new SelectList(Enum.GetValues<TipoOperacao>(), filtro.TipoOperacao);
-        ViewBag.Categorias = new SelectList(categorias, "Id", "Nome", filtro.CategoriaId);
-        ViewBag.Contas = new SelectList(contas, "Id", "Numero", filtro.ContaBancariaId);
+        ViewBag.Tipos = new SelectList(Enum.GetValues<TipoTransacao>(), filtro?.Tipo);
+        ViewBag.TiposOperacao = new SelectList(Enum.GetValues<TipoOperacao>(), filtro?.TipoOperacao);
+        ViewBag.Categorias = new SelectList(categorias, "Id", "Nome", filtro?.CategoriaId);
+        ViewBag.Contas = new SelectList(contas, "Id", "Numero", filtro?.ContaBancariaId);
     }
 
     [HttpGet]

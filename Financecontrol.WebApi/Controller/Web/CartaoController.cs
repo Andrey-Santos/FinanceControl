@@ -31,7 +31,6 @@ public class CartaoController : Controller
         var contas = await _contasBancariasRepository.GetAllAsync();
 
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
-        ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoCartao)));
         return View();
     }
 
@@ -43,7 +42,6 @@ public class CartaoController : Controller
         {
             var contas = await _contasBancariasRepository.GetAllAsync();
             ViewBag.Contas = new SelectList(contas, "Id", "Numero");
-            ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoCartao)));
             return View(dto);
         }
 
@@ -61,7 +59,6 @@ public class CartaoController : Controller
         var contas = await _contasBancariasRepository.GetAllAsync();
 
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
-        ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoCartao)));
 
         var dto = new CartaoUpdateDto
         {
@@ -85,7 +82,6 @@ public class CartaoController : Controller
             var contas = await _contasBancariasRepository.GetAllAsync();
 
             ViewBag.Contas = new SelectList(contas, "Id", "Numero");
-            ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoCartao)));
             return View(dto);
         }
 

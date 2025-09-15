@@ -25,20 +25,26 @@
                 <div class="mb-3">
                     <label asp-for="Tipo" class="form-label"></label>
                     <select asp-for="Tipo" class="form-select"
-                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoTransacao>()"></select>
+                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoTransacao>()">
+                        <option value="">Selecione...</option>
+                    </select>
                     <span asp-validation-for="Tipo" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="ContaBancariaId" class="form-label">Conta Bancária</label>
-                    <select asp-for="ContaBancariaId" asp-items="ViewBag.Contas" class="form-select"></select>
+                    <select asp-for="ContaBancariaId" asp-items="ViewBag.Contas" class="form-select">
+                        <option value="">Selecione...</option>
+                    </select>
                     <span asp-validation-for="ContaBancariaId" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3" id="tipooperacao-group">
                     <label asp-for="TipoOperacao" class="form-label"></label>
                     <select asp-for="TipoOperacao" class="form-select"
-                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoOperacao>()"></select>
+                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoOperacao>()">
+                        <option value="">Selecione...</option>
+                    </select>
                     <span asp-validation-for="TipoOperacao" class="text-danger small"></span>
                 </div>
 
@@ -59,7 +65,9 @@
 
                 <div class="mb-3">
                     <label asp-for="CategoriaId" class="form-label">Categoria de Transação</label>
-                    <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select"></select>
+                    <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select">
+                        <option value="">Selecione...</option>
+                    </select>
                     <span asp-validation-for="CategoriaId" class="text-danger small"></span>
                 </div>
 
@@ -85,7 +93,6 @@
                         Salvar e Continuar
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
@@ -93,75 +100,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        function carregarDadosIniciais() {
-            var contaSelect = document.getElementById('ContaBancariaId');
-            if (contaSelect && contaSelect.value) {
-                carregarCartoes(contaSelect.value);
-            } else {
-                toggleTransacao();
-            }
-        }
-        async function carregarCartoes(contaId) {
-            var cartaoSelect = document.getElementById('CartaoId');
-            cartaoSelect.innerHTML = '';
-
-            var optDefault = document.createElement('option');
-            optDefault.value = '';
-            optDefault.textContent = 'Selecione...';
-            cartaoSelect.appendChild(optDefault);
-
-            if (!contaId) {
-                toggleCartao();
-                return;
-            }
-
-            try {
-                var url = '@Url.Action("CartoesPorConta", "Transacao")' + '?contaBancariaId=' + encodeURIComponent(contaId);
-                var resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-
-                if (!resp.ok) throw new Error('Falha ao carregar cartões');
-                var itens = await resp.json();
-                itens.forEach(function (c) {
-                    var opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = c.nome;
-                    cartaoSelect.appendChild(opt);
-                });
-            } catch (e) {
-                console.error('Erro ao carregar cartões:', e);
-            }
-
-            toggleCartao();
-        }
-
-        function toggleTransacao() {
-            var tipoTransacao = document.getElementById('Tipo');
-            var tipoOperacao = document.getElementById('tipooperacao-group');
-
-            tipoOperacao.style.display = tipoTransacao.value == @((int)FinanceControl.Core.Domain.Enums.TipoTransacao.Despesa) ? '' : 'none';
-
-            toggleCartao();
-        }
-
-        function toggleCartao() {
-            var tipoOperacao = document.getElementById('TipoOperacao');
-            var tipoTransacao = document.getElementById('Tipo');
-            var cartaoGroup = document.getElementById('cartao-group');
-            var cartaoSelect = document.getElementById('CartaoId');
-
-            var isCredito = tipoOperacao.value == @((int)FinanceControl.Core.Domain.Enums.TipoOperacao.Credito) && tipoTransacao.value == @((int)FinanceControl.Core.Domain.Enums.TipoTransacao.Despesa);
-            cartaoGroup.style.display = isCredito ? '' : 'none';
-            cartaoSelect.disabled = !isCredito;
-        }
-
-        document.getElementById('TipoOperacao').addEventListener('change', toggleCartao);
-        document.getElementById('Tipo').addEventListener('change', toggleTransacao);
-        document.getElementById('ContaBancariaId').addEventListener('change', function () {
-            carregarCartoes(this.value);
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            carregarDadosIniciais();
-        });
-    </script>
+    <script src="~/js/transacao.js"></script>
 }

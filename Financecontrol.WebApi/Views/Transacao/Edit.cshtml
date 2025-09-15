@@ -1,51 +1,75 @@
 @model FinanceControl.Core.Application.DTOs.Transacao.TransacaoUpdateDto
 
 @{
-    ViewData["Title"] = "Alterar - Transação";
+    ViewData["Title"] = "Editar - Transação";
 }
 
 <div class="mt-5 row justify-content-center">
     <div class="card bg-dark text-white shadow col-md-6">
         <div class="card-body">
-            <h4 class="card-title mb-4">Alterar</h4>
+            <h4 class="card-title mb-4">Editar</h4>
 
             <form asp-action="Edit" method="post">
                 <input type="hidden" asp-for="Id" />
 
                 <div class="mb-3">
-                    <label asp-for="Descricao" class="form-label"></label>
+                    <label asp-for="Descricao" class="form-label">Descrição</label>
                     <input asp-for="Descricao" class="form-control" />
                     <span asp-validation-for="Descricao" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="Valor" class="form-label"></label>
-                    <input asp-for="Valor" class="form-control" type="number" step="0.01" />
+                    <input asp-for="Valor" type="number" step="0.01" class="form-control" />
                     <span asp-validation-for="Valor" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="Tipo" class="form-label"></label>
                     <select asp-for="Tipo" class="form-select"
-                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoTransacao>()"></select>
+                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoTransacao>()">
+                        <option value="">Selecione...</option>
+                    </select>
                     <span asp-validation-for="Tipo" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="ContaBancariaId" class="form-label">Conta Bancária</label>
+                    <select asp-for="ContaBancariaId" asp-items="ViewBag.Contas" class="form-select">
+                        <option value="">Selecione...</option>
+                    </select>
+                    <span asp-validation-for="ContaBancariaId" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" id="tipooperacao-group">
+                    <label asp-for="TipoOperacao" class="form-label"></label>
+                    <select asp-for="TipoOperacao" class="form-select"
+                        asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoOperacao>()">
+                        <option value="">Selecione...</option>
+                    </select>
+                    <span asp-validation-for="TipoOperacao" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3" id="cartao-group">
+                    <label asp-for="CartaoId" class="form-label">Cartão</label>
+                    <select asp-for="CartaoId" asp-items="ViewBag.Cartoes" class="form-select">
+                        <option value="">Selecione...</option>
+                    </select>
+                    <span asp-validation-for="CartaoId" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
                     <label asp-for="DataEfetivacao" class="form-label">Data de efetivação</label>
-                    <input asp-for="DataEfetivacao" type="datetime-local" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                    <input asp-for="DataEfetivacao" type="datetime-local" class="form-control"
+                        asp-format="{0:yyyy-MM-ddTHH:mm}" />
                     <span asp-validation-for="DataEfetivacao" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="ContaBancariaId" class="form-label"></label>
-                    <select asp-for="ContaBancariaId" class="form-select" asp-items="ViewBag.Contas"></select>
-                    <span asp-validation-for="ContaBancariaId" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="CategoriaId" class="form-label">Categoria</label>
-                    <select asp-for="CategoriaId" class="form-select" asp-items="ViewBag.Categorias"></select>
+                    <label asp-for="CategoriaId" class="form-label">Categoria de Transação</label>
+                    <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select">
+                        <option value="">Selecione...</option>
+                    </select>
                     <span asp-validation-for="CategoriaId" class="text-danger small"></span>
                 </div>
 
@@ -55,19 +79,16 @@
                     <span asp-validation-for="Observacao" class="text-danger small"></span>
                 </div>
 
-                @if (TempData["Erro"] != null)
-                {
-                    <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>
-                }
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
                 </div>
             </form>
-            @section Scripts {
-                @{
-                    await Html.RenderPartialAsync("_ValidationScriptsPartial");
-                }
-            }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/transacao.js"></script>
+}

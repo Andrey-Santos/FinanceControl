@@ -53,14 +53,14 @@
                 <div class="row g-3 mt-2">
                     <div class="col-md-2">
                         <label for="Tipo" class="form-label text-light">Tipo</label>
-                        <select asp-items="ViewBag.Tipos" class="form-select bg-dark text-light border-secondary"
+                        <select asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoOperacao>()" class="form-select bg-dark text-light border-secondary"
                             id="Tipo" name="Tipo">
                             <option value="">Todos</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label for="TipoOperacao" class="form-label text-light">Tipo Operação</label>
-                        <select asp-items="ViewBag.TiposOperacao"
+                        <select asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoOperacao>()"
                             class="form-select bg-dark text-light border-secondary" id="TipoOperacao"
                             name="TipoOperacao">
                             <option value="">Todos</option>

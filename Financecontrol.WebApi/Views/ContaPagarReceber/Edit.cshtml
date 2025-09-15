@@ -38,7 +38,7 @@
 
                 <div class="mb-3">
                     <label asp-for="Tipo" class="form-label"></label>
-                    <select asp-for="Tipo" class="form-select" asp-items="ViewBag.Tipos"">
+                    <select asp-for="Tipo" class="form-select" asp-items="Html.GetEnumSelectList<FinanceControl.Core.Domain.Enums.TipoTransacao>()"">
                     </select>
                     <span asp-validation-for=" Tipo" class="text-danger small"></span>
                 </div>

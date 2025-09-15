@@ -23,7 +23,6 @@ public class ContaPagarReceberController : Controller
     {
         var contas = await _contasBancariasRepository.GetAllAsync();
 
-        ViewBag.Tipos = new SelectList(Enum.GetValues(typeof(TipoTransacao)));
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
     }
 

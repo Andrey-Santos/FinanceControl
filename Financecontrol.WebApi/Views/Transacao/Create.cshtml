@@ -62,7 +62,7 @@
                     <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select"></select>
                     <span asp-validation-for="CategoriaId" class="text-danger small"></span>
                 </div>
-                
+
                 <div class="mb-3">
                     <label asp-for="Observacao" class="form-label">Observação</label>
                     <textarea asp-for="Observacao" class="form-control" rows="3"></textarea>
@@ -94,11 +94,18 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        function carregarDadosIniciais() {
+            var contaSelect = document.getElementById('ContaBancariaId');
+            if (contaSelect && contaSelect.value) {
+                carregarCartoes(contaSelect.value);
+            } else {
+                toggleTransacao();
+            }
+        }
         async function carregarCartoes(contaId) {
             var cartaoSelect = document.getElementById('CartaoId');
-            if (!cartaoSelect) return;
-
             cartaoSelect.innerHTML = '';
+
             var optDefault = document.createElement('option');
             optDefault.value = '';
             optDefault.textContent = 'Selecione...';
@@ -112,6 +119,7 @@
             try {
                 var url = '@Url.Action("CartoesPorConta", "Transacao")' + '?contaBancariaId=' + encodeURIComponent(contaId);
                 var resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
                 if (!resp.ok) throw new Error('Falha ao carregar cartões');
                 var itens = await resp.json();
                 itens.forEach(function (c) {
@@ -125,15 +133,6 @@
             }
 
             toggleCartao();
-        }
-
-        function carregarDadosIniciais() {
-            var contaSelect = document.getElementById('ContaBancariaId');
-            if (contaSelect && contaSelect.value) {
-                carregarCartoes(contaSelect.value);
-            } else {
-                toggleTransacao();
-            }
         }
 
         function toggleTransacao() {
@@ -150,7 +149,6 @@
             var tipoTransacao = document.getElementById('Tipo');
             var cartaoGroup = document.getElementById('cartao-group');
             var cartaoSelect = document.getElementById('CartaoId');
-            if (!tipoOperacao || !cartaoGroup || !cartaoSelect) return;
 
             var isCredito = tipoOperacao.value == @((int)FinanceControl.Core.Domain.Enums.TipoOperacao.Credito) && tipoTransacao.value == @((int)FinanceControl.Core.Domain.Enums.TipoTransacao.Despesa);
             cartaoGroup.style.display = isCredito ? '' : 'none';
@@ -159,15 +157,10 @@
 
         document.getElementById('TipoOperacao').addEventListener('change', toggleCartao);
         document.getElementById('Tipo').addEventListener('change', toggleTransacao);
-
-        var contaSelect = document.getElementById('ContaBancariaId');
-        if (contaSelect) {
-            contaSelect.addEventListener('change', function () {
-                carregarCartoes(this.value);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('ContaBancariaId').addEventListener('change', function () {
+            carregarCartoes(this.value);
+        });
+        document.addEventListener('DOMContentLoaded', function () {
             carregarDadosIniciais();
         });
     </script>

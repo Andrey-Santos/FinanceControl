@@ -49,6 +49,12 @@
                     <span asp-validation-for="CategoriaId" class="text-danger small"></span>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="Observacao" class="form-label">Observação</label>
+                    <textarea asp-for="Observacao" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Observacao" class="text-danger small"></span>
+                </div>
+
                 @if (TempData["Erro"] != null)
                 {
                     <div class="alert alert-danger py-2 px-3 small">@TempData["Erro"]</div>

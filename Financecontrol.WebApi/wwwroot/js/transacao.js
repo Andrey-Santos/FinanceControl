@@ -44,12 +44,9 @@ function carregarDadosIniciais() {
 
 function toggleTransacao() {
     var tipoTransacao = document.getElementById('Tipo');
-    var tipoOperacaoGroup = document.getElementById('tipooperacao-group');
+    var tipoOperacao = document.getElementById('tipooperacao-group');
 
-    if (!tipoTransacao || !tipoOperacaoGroup) return;
-
-    tipoOperacaoGroup.style.display = 
-        tipoTransacao.value == 1 /* Despesa */ ? '' : 'none';
+    tipoOperacao.style.display = tipoTransacao.value == 2 ? '' : 'none';
 
     toggleCartao();
 }
@@ -59,12 +56,10 @@ function toggleCartao() {
     var tipoTransacao = document.getElementById('Tipo');
     var cartaoGroup = document.getElementById('cartao-group');
     var cartaoSelect = document.getElementById('CartaoId');
-    if (!tipoOperacao || !cartaoGroup || !cartaoSelect) return;
 
-    var isCredito = tipoOperacao.value == 2 /* Crédito */ 
-                 && tipoTransacao.value == 1 /* Despesa */;
-    cartaoGroup.style.display = isCredito ? '' : 'none';
-    cartaoSelect.disabled = !isCredito;
+    var isDespesa = tipoTransacao.value == 2 /* Despesa */;
+    cartaoGroup.style.display = isDespesa ? '' : 'none';
+    cartaoSelect.disabled = !isDespesa;
 }
 
 function initDateTimeSplitField() {

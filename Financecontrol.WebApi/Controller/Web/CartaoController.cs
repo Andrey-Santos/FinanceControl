@@ -25,12 +25,18 @@ public class CartaoController : Controller
         return View(await _useCase.GetAllAsync());
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Create()
+
+    public async Task LoadLists()
     {
         var contas = await _contasBancariasRepository.GetAllAsync();
 
         ViewBag.Contas = new SelectList(contas, "Id", "Numero");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+        await LoadLists();
         return View();
     }
 
@@ -40,8 +46,7 @@ public class CartaoController : Controller
     {
         if (!ModelState.IsValid)
         {
-            var contas = await _contasBancariasRepository.GetAllAsync();
-            ViewBag.Contas = new SelectList(contas, "Id", "Numero");
+            await LoadLists();
             return View(dto);
         }
 
@@ -56,9 +61,7 @@ public class CartaoController : Controller
         if (entity == null)
             return NotFound();
 
-        var contas = await _contasBancariasRepository.GetAllAsync();
-
-        ViewBag.Contas = new SelectList(contas, "Id", "Numero");
+        await LoadLists();
 
         var dto = new CartaoUpdateDto
         {
@@ -79,9 +82,7 @@ public class CartaoController : Controller
     {
         if (!ModelState.IsValid)
         {
-            var contas = await _contasBancariasRepository.GetAllAsync();
-
-            ViewBag.Contas = new SelectList(contas, "Id", "Numero");
+            await LoadLists();
             return View(dto);
         }
 

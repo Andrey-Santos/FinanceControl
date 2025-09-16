@@ -64,16 +64,6 @@ public class TransacaoController : Controller
         return View(model);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> CartoesPorConta(long contaBancariaId)
-    {
-        var cartoes = await _cartaoRepository.GetAllAsync();
-        var filtrados = cartoes
-            .Where(c => c.Tipo == TipoCartao.Credito && c.ContaBancariaId == contaBancariaId)
-            .Select(c => new { id = c.Id, nome = c.Apelido })
-            .ToList();
-        return Json(filtrados);
-    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -94,6 +84,17 @@ public class TransacaoController : Controller
         }
         else
             return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CartoesPorConta(long contaBancariaId)
+    {
+        var cartoes = await _cartaoRepository.GetAllAsync();
+        var filtrados = cartoes
+            .Where(c => c.Tipo == TipoCartao.Credito && c.ContaBancariaId == contaBancariaId)
+            .Select(c => new { id = c.Id, nome = c.Apelido })
+            .ToList();
+        return Json(filtrados);
     }
 
     [HttpGet]

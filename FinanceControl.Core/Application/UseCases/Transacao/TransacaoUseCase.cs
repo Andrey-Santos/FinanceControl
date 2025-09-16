@@ -12,15 +12,17 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 {
     private readonly ITransacaoRepository _repository;
     private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
+    private readonly ICartaoRepository _cartaoTransacaoRepository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, IUnitOfWork unitOfWork)
+    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, ICartaoRepository cartaoRepository, IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
         _categoriaTransacaoRepository = categoriaRepository;
         _contaBancariaRepository = contaBancariaRepository;
+        _cartaoTransacaoRepository = cartaoRepository;
     }
 
     public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual, long usuarioId)
@@ -177,6 +179,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         if ((int)dto.CategoriaId != 0)
             await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
+
+
+        if ((int)(dto.CartaoId ?? 0) != 0)
+            await ValidarEntidadeExistenteAsync(_cartaoTransacaoRepository, dto.CartaoId, "Cartão");
 
         var transacao = new Domain.Entities.Transacao
         {

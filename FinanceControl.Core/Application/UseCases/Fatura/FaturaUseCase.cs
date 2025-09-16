@@ -24,7 +24,8 @@ public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, C
             Id = u.Id,
             Mes = u.Mes,
             Ano = u.Ano,
-            CartaoId = u.CartaoId
+            CartaoId = u.CartaoId,
+            CartaoApelido = u.Cartao.Apelido
         });
     }
 
@@ -41,7 +42,7 @@ public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, C
     }
 
     public async Task<long> AddAsync(CreateFaturaDto dto)
-    {
+    {   
         await ValidarEntidadeExistenteAsync(_cartaoRepository, dto.CartaoId, "Cartão");
 
         var Fatura = new Domain.Entities.Fatura

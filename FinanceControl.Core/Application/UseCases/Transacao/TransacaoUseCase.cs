@@ -14,15 +14,17 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
     private readonly ICartaoRepository _cartaoTransacaoRepository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
+    private readonly IFaturaRepository _faturaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, ICartaoRepository cartaoRepository, IUnitOfWork unitOfWork)
+    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, ICartaoRepository cartaoRepository, IFaturaRepository faturaRepository, IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
         _categoriaTransacaoRepository = categoriaRepository;
         _contaBancariaRepository = contaBancariaRepository;
         _cartaoTransacaoRepository = cartaoRepository;
+        _faturaRepository = faturaRepository;
     }
 
     public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual, long usuarioId)
@@ -180,7 +182,6 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         if ((int)dto.CategoriaId != 0)
             await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
 
-
         if ((int)(dto.CartaoId ?? 0) != 0)
             await ValidarEntidadeExistenteAsync(_cartaoTransacaoRepository, (long)(dto.CartaoId ?? 0), "Cartão");
 
@@ -200,10 +201,41 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             DataAlteracao = DateTime.UtcNow
         };
 
+        if (transacao.Tipo == TipoTransacao.Receita)
+            transacao.TipoOperacao = TipoOperacao.Debito;
+            
+        else if (transacao.TipoOperacao == TipoOperacao.Credito)
+            transacao.FaturaId = await GetFatura(dto);
+
         await _repository.AddAsync(transacao);
         await _unitOfWork.CommitAsync();
 
         return transacao.Id;
+    }
+
+    public async Task<long> GetFatura(TransacaoCreateDto dto)
+    {
+        long cartaoId = (long)(dto.CartaoId ?? 0);
+
+        if ((cartaoId == 0) || (dto.TipoOperacao == TipoOperacao.Debito))
+            return 0;
+
+        var faturaId = await _faturaRepository.GetByCartaoEFaturaAsync(cartaoId, dto.DataEfetivacao.Month, dto.DataEfetivacao.Year);
+
+        if (faturaId != null)
+            return faturaId.Id;
+
+        var novaFatura = new Domain.Entities.Fatura
+        {
+            CartaoId = cartaoId,
+            Mes = (short)dto.DataEfetivacao.Month,
+            Ano = (short)dto.DataEfetivacao.Year,
+            DataCadastro = DateTime.UtcNow,
+            DataAlteracao = DateTime.UtcNow
+        };
+        await _faturaRepository.AddAsync(novaFatura);
+        await _unitOfWork.CommitAsync();
+        return novaFatura.Id;
     }
 
     public async Task UpdateAsync(TransacaoUpdateDto dto)
@@ -280,7 +312,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             .Select(g => new
             {
                 Categoria = g.Key,
-                Valor = g.Sum(t => t.Tipo == TipoTransacao.Despesa ? t.Valor : 0)
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Despesa && t.TipoOperacao != TipoOperacao.Credito ? t.Valor : 0)
             })
             .Where(x => x.Valor != 0);
 

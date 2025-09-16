@@ -89,7 +89,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         return Transacao is null ? null : new TransacaoResponseDto
         {
             Id = Transacao.Id,
-            Descricao = Transacao.Descricao,    
+            Descricao = Transacao.Descricao,
             Valor = Transacao.Valor,
             DataEfetivacao = Transacao.DataEfetivacao,
             ContaBancariaId = Transacao.ContaBancariaId,
@@ -98,7 +98,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             TipoOperacao = Transacao.TipoOperacao,
             Observacao = Transacao.Observacao,
             CartaoId = Transacao.CartaoId,
-            FaturaId = Transacao.FaturaId
+            FaturaId = Transacao.FaturaId,
         };
     }
 
@@ -203,7 +203,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         if (transacao.Tipo == TipoTransacao.Receita)
             transacao.TipoOperacao = TipoOperacao.Debito;
-            
+
         else if (transacao.TipoOperacao == TipoOperacao.Credito)
             transacao.FaturaId = await GetFatura(dto);
 

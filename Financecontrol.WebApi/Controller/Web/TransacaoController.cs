@@ -115,7 +115,9 @@ public class TransacaoController : Controller
             ContaBancariaId = entity.ContaBancariaId,
             CategoriaId = entity.CategoriaId,
             Tipo = entity.Tipo,
-            Observacao = entity.Observacao
+            Observacao = entity.Observacao,
+            CartaoId = entity.CartaoId,
+            TipoOperacao = entity.TipoOperacao
         };
 
         return View(dto);

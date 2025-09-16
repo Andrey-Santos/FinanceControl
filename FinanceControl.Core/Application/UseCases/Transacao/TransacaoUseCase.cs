@@ -87,7 +87,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         return Transacao is null ? null : new TransacaoResponseDto
         {
             Id = Transacao.Id,
-            Descricao = Transacao.Descricao,
+            Descricao = Transacao.Descricao,    
             Valor = Transacao.Valor,
             DataEfetivacao = Transacao.DataEfetivacao,
             ContaBancariaId = Transacao.ContaBancariaId,
@@ -182,7 +182,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
 
         if ((int)(dto.CartaoId ?? 0) != 0)
-            await ValidarEntidadeExistenteAsync(_cartaoTransacaoRepository, dto.CartaoId, "Cartão");
+            await ValidarEntidadeExistenteAsync(_cartaoTransacaoRepository, (long)(dto.CartaoId ?? 0), "Cartão");
 
         var transacao = new Domain.Entities.Transacao
         {

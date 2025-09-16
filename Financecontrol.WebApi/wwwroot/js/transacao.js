@@ -38,6 +38,8 @@ function carregarDadosIniciais() {
     } else {
         toggleTransacao();
     }
+
+    initDateTimeSplitField();
 }
 
 function toggleTransacao() {
@@ -64,6 +66,37 @@ function toggleCartao() {
     cartaoGroup.style.display = isCredito ? '' : 'none';
     cartaoSelect.disabled = !isCredito;
 }
+
+function initDateTimeSplitField() {
+    const dateInput = document.getElementById('DataEfetivacaoDate');
+    const timeInput = document.getElementById('DataEfetivacaoTime');
+    const hidden = document.getElementById('DataEfetivacao');
+
+    function syncToHidden() {
+        const date = dateInput.value; // yyyy-MM-dd
+        const time = timeInput.value; // HH:mm
+        if (date && time) {
+            hidden.value = `${date}T${time}`;
+        } else if (date && !time) {
+            hidden.value = `${date}T00:00`;
+        } else {
+            hidden.value = '';
+        }
+    }
+
+    dateInput.addEventListener('change', syncToHidden);
+    timeInput.addEventListener('change', syncToHidden);
+
+    // garante que sincroniza antes de enviar
+    const form = hidden.closest('form');
+    if (form) {
+        form.addEventListener('submit', syncToHidden);
+    }
+
+    // já sincroniza na carga inicial
+    syncToHidden();
+}
+
 
 document.addEventListener('DOMContentLoaded', function () {
     var tipoOperacao = document.getElementById('TipoOperacao');

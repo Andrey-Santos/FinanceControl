@@ -59,9 +59,22 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="DataEfetivacao" class="form-label">Data de efetivação</label>
-                    <input asp-for="DataEfetivacao" type="datetime-local" class="form-control"
-                        asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                    <label class="form-label">Data de efetivação</label>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input id="DataEfetivacaoDate" type="date" class="form-control"
+                                value="@(Model?.DataEfetivacao != default ? Model?.DataEfetivacao.ToString("yyyy-MM-dd") : "")" />
+                        </div>
+                        <div class="col-6">
+                            <input id="DataEfetivacaoTime" type="time" class="form-control"
+                                value="@(Model?.DataEfetivacao != default ? Model?.DataEfetivacao.ToString("HH:mm") : "")" />
+                        </div>
+                    </div>
+
+                    <!-- Campo oculto real que será enviado ao DTO -->
+                    <input asp-for="DataEfetivacao" type="hidden" id="DataEfetivacao" />
+
                     <span asp-validation-for="DataEfetivacao" class="text-danger small"></span>
                 </div>
 

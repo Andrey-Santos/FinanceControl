@@ -25,11 +25,8 @@ public class TransacaoController : Controller
 
     public async Task LoadLists(TransacaoFilterDto? filtro = null)
     {
-        var contas     = await _contaBancariaRepository.GetAllAsync();
-        var categorias = await _categoriaTransacaoRepository.GetAllAsync();
-
-        ViewBag.Categorias = new SelectList(categorias, "Id", "Nome", filtro?.CategoriaId);
-        ViewBag.Contas     = new SelectList(contas, "Id", "Numero", filtro?.ContaBancariaId);
+        ViewBag.Categorias = new SelectList(await _categoriaTransacaoRepository.GetAllAsync(), "Id", "Nome", filtro?.CategoriaId);
+        ViewBag.Contas     = new SelectList(await _contaBancariaRepository.GetAllAsync(), "Id", "Numero", filtro?.ContaBancariaId);
     }
 
     [HttpGet]
@@ -116,7 +113,8 @@ public class TransacaoController : Controller
             Valor = entity.Valor,
             ContaBancariaId = entity.ContaBancariaId,
             CategoriaId = entity.CategoriaId,
-            Tipo = entity.Tipo
+            Tipo = entity.Tipo,
+            Observacao = entity.Observacao
         };
 
         return View(dto);

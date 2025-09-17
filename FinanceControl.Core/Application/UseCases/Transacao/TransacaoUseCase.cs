@@ -188,7 +188,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         var transacao = new Domain.Entities.Transacao
         {
             Descricao = dto.Descricao,
-            DataEfetivacao = DateTime.SpecifyKind(dto.DataEfetivacao, DateTimeKind.Utc),
+            DataEfetivacao = dto.DataEfetivacao,
             Valor = Math.Abs(dto.Valor),
             ContaBancariaId = dto.ContaBancariaId,
             CategoriaId = dto.CategoriaId,

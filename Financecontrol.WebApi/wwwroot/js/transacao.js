@@ -18,11 +18,17 @@ async function carregarCartoes(contaId) {
         var resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
         if (!resp.ok) throw new Error('Falha ao carregar cartões');
         var itens = await resp.json();
+        var cartaoSelecionado = cartaoSelect.parentElement.getAttribute('data-cartao-id');
+        
         itens.forEach(function (c) {
             var opt = document.createElement('option');
             opt.value = c.id;
             opt.textContent = c.nome;
             cartaoSelect.appendChild(opt);
+
+            if (cartaoSelecionado && cartaoSelecionado == c.id) {
+                opt.selected = true;
+            }
         });
     } catch (e) {
         console.error('Erro ao carregar cartões:', e);

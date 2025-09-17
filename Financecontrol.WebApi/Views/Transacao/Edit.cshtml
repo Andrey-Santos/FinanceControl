@@ -50,9 +50,9 @@
                     <span asp-validation-for="TipoOperacao" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3" id="cartao-group">
+                <div class="mb-3" id="cartao-group" data-cartao-id="@Model.CartaoId">
                     <label asp-for="CartaoId" class="form-label">Cartão</label>
-                    <select asp-for="CartaoId" asp-items="ViewBag.Cartoes" class="form-select">
+                    <select asp-for="CartaoId" class="form-select">
                         <option value="">Selecione...</option>
                     </select>
                     <span asp-validation-for="CartaoId" class="text-danger small"></span>

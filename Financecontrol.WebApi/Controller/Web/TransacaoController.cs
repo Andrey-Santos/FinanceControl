@@ -117,7 +117,7 @@ public class TransacaoController : Controller
             Tipo = entity.Tipo,
             Observacao = entity.Observacao,
             CartaoId = entity.CartaoId,
-            TipoOperacao = entity.TipoOperacao
+            TipoOperacao = entity.TipoOperacao,
         };
 
         return View(dto);

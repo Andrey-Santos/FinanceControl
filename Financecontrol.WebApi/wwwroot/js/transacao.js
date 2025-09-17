@@ -1,4 +1,5 @@
 async function carregarCartoes(contaId) {
+    debugger;
     var cartaoSelect = document.getElementById('CartaoId');
     if (!cartaoSelect) return;
 
@@ -19,7 +20,7 @@ async function carregarCartoes(contaId) {
         if (!resp.ok) throw new Error('Falha ao carregar cartões');
         var itens = await resp.json();
         var cartaoSelecionado = cartaoSelect.parentElement.getAttribute('data-cartao-id');
-        
+
         itens.forEach(function (c) {
             var opt = document.createElement('option');
             opt.value = c.id;
@@ -58,7 +59,6 @@ function toggleTransacao() {
 }
 
 function toggleCartao() {
-    var tipoOperacao = document.getElementById('TipoOperacao');
     var tipoTransacao = document.getElementById('Tipo');
     var cartaoGroup = document.getElementById('cartao-group');
     var cartaoSelect = document.getElementById('CartaoId');

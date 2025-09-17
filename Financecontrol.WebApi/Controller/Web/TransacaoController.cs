@@ -91,7 +91,7 @@ public class TransacaoController : Controller
     {
         var cartoes = await _cartaoRepository.GetAllAsync();
         var filtrados = cartoes
-            .Where(c => c.Tipo == TipoCartao.Credito && c.ContaBancariaId == contaBancariaId)
+            .Where(c => c.ContaBancariaId == contaBancariaId)
             .Select(c => new { id = c.Id, nome = c.Apelido })
             .ToList();
         return Json(filtrados);

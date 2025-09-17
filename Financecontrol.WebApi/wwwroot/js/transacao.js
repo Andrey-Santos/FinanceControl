@@ -1,6 +1,6 @@
 async function carregarCartoes(contaId) {
-    debugger;
     var cartaoSelect = document.getElementById('CartaoId');
+    var tipoOperacao = document.getElementById('TipoOperacao');
     if (!cartaoSelect) return;
 
     cartaoSelect.innerHTML = '';
@@ -15,7 +15,7 @@ async function carregarCartoes(contaId) {
     }
 
     try {
-        var url = '/Transacao/CartoesPorConta?contaBancariaId=' + encodeURIComponent(contaId);
+        var url = '/Transacao/CartoesPorConta?contaBancariaId=' + encodeURIComponent(contaId) + '&tipoOperacao=' + encodeURIComponent(tipoOperacao);
         var resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
         if (!resp.ok) throw new Error('Falha ao carregar cartões');
         var itens = await resp.json();

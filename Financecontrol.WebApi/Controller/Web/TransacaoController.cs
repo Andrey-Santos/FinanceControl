@@ -87,15 +87,17 @@ public class TransacaoController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> CartoesPorConta(long contaBancariaId)
-    {
-        var cartoes = await _cartaoRepository.GetAllAsync();
-        var filtrados = cartoes
-            .Where(c => c.ContaBancariaId == contaBancariaId)
-            .Select(c => new { id = c.Id, nome = c.Apelido })
-            .ToList();
-        return Json(filtrados);
-    }
+public async Task<IActionResult> CartoesPorConta(long contaBancariaId, int tipoOperacao)
+{
+    var cartoes = await _cartaoRepository.GetAllAsync();
+
+    var filtrados = cartoes
+        .Where(c => c.ContaBancariaId == contaBancariaId && c.Tipo == ((TipoOperacao)tipoOperacao == TipoOperacao.Credito ? TipoCartao.Credito : TipoCartao.Debito))
+        .Select(c => new { id = c.Id, nome = c.Apelido })
+        .ToList();
+
+    return Json(filtrados);
+}
 
     [HttpGet]
     public async Task<IActionResult> Edit(long id)

@@ -1,8 +1,6 @@
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.ContaPagarReceber;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using ClosedXML.Excel;
 using FinanceControl.Core.Domain.Enums;
 using FinanceControl.Core.Application.DTOs.Transacao;
 using FinanceControl.Core.Application.UseCases.Transacao;
@@ -157,7 +155,6 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
             conta.TransacaoId = await _transacaoUseCase.AddAsync(transacao);
         }
 
-
         await UpdateAsync(conta);
     }
     public async Task DeleteAsync(long id)
@@ -165,5 +162,29 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
         await _repository.DeleteAsync(id);
         await _unitOfWork.CommitAsync();
     }
+    public async Task<decimal> GetSaldoPrevistoProximoMes(int mesAtual, int anoAtual, long usuarioId)
+    {
+        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
+        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
+        var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
 
+        var baseQuery = _repository
+            .GetAll()
+            .AsNoTracking()
+            .Select(t => new
+            {
+                t.Valor,
+                t.Tipo,
+                t.ContaBancaria.UsuarioId,
+                t.DataPagamento,
+                t.DataVencimento
+            });
+
+        var mesQuery = baseQuery.Where(t => t.DataVencimento >= fimMesAtual && t.DataVencimento <= fimProximoMes && t.UsuarioId == usuarioId && t.DataPagamento == null);
+
+        return await baseQuery
+                    .Where(t => t.UsuarioId == usuarioId && t.DataVencimento <= fimProximoMes)
+                    .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+    }
 }

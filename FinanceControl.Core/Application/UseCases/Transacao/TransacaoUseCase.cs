@@ -350,7 +350,6 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             saldoPrevistoProximoMes
         );
     }
-
     public async Task<int> ImportarAsync(IFormFile arquivo, long contaBancariaId)
     {
         if (arquivo == null || arquivo.Length == 0)

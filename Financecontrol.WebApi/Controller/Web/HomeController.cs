@@ -3,6 +3,7 @@ using FinanceControl.Core.Application.UseCases.Transacao;
 using FinanceControl.Core.Domain.Enums;
 using FinanceControl.Core.Domain.Entities;
 using System.Security.Claims;
+using FinanceControl.Core.Application.UseCases.ContaPagarReceber;
 
 namespace FinanceControl.WebApi.Controllers;
 
@@ -10,10 +11,12 @@ namespace FinanceControl.WebApi.Controllers;
 public class HomeController : Controller
 {
     private readonly TransacaoUseCase _transacaoUseCase;
+    private readonly ContaPagarReceberUseCase _contaPagarReceberUseCase;
 
-    public HomeController(TransacaoUseCase transacaoUseCase)
+    public HomeController(TransacaoUseCase transacaoUseCase, ContaPagarReceberUseCase contaPagarReceberUseCase)
     {
         _transacaoUseCase = transacaoUseCase;
+        _contaPagarReceberUseCase = contaPagarReceberUseCase;
     }
 
     [HttpGet]
@@ -54,6 +57,7 @@ public class HomeController : Controller
         ViewBag.SaldoMesAnterior = saldoMesAnterior;
         ViewBag.SaldoPrevistoProximoMes = saldoPrevistoProximoMes;
 
+        ViewBag.SaldoPrevistoProximoMes += _contaPagarReceberUseCase.GetSaldoPrevistoProximoMes(mes, ano, usuarioId);
         ViewBag.MesAtual = mes;
         ViewBag.AnoAtual = ano;
 

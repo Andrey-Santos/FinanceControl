@@ -57,7 +57,7 @@ public class HomeController : Controller
         ViewBag.SaldoMesAnterior = saldoMesAnterior;
         ViewBag.SaldoPrevistoProximoMes = saldoPrevistoProximoMes;
 
-        ViewBag.SaldoPrevistoProximoMes += _contaPagarReceberUseCase.GetSaldoPrevistoProximoMes(mes, ano, usuarioId);
+        ViewBag.SaldoPrevistoProximoMes += await _contaPagarReceberUseCase.GetSaldoPrevistoProximoMes(mes, ano, usuarioId);
         ViewBag.MesAtual = mes;
         ViewBag.AnoAtual = ano;
 

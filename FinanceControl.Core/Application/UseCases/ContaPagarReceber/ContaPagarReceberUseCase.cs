@@ -165,7 +165,7 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
     public async Task<decimal> GetSaldoPrevistoProximoMes(int mesAtual, int anoAtual, long usuarioId)
     {
         var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
-        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
+        var fimMesAtual    = inicioMesAtual.AddMonths(1).AddDays(-1);
         var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
 
         var baseQuery = _repository
@@ -178,13 +178,10 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
                 t.ContaBancaria.UsuarioId,
                 t.DataPagamento,
                 t.DataVencimento
-            });
+            })
+            .Where(t => t.DataVencimento >= fimMesAtual && t.DataVencimento <= fimProximoMes && t.UsuarioId == usuarioId && t.DataPagamento == null);
 
-        var mesQuery = baseQuery.Where(t => t.DataVencimento >= fimMesAtual && t.DataVencimento <= fimProximoMes && t.UsuarioId == usuarioId && t.DataPagamento == null);
-
-        return await baseQuery
-                    .Where(t => t.UsuarioId == usuarioId && t.DataVencimento <= fimProximoMes)
-                    .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+        return await baseQuery.SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
     }
 }

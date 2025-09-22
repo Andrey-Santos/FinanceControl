@@ -1,5 +1,6 @@
 using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.Fatura;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceControl.Core.Application.UseCases.Fatura;
 
@@ -18,8 +19,12 @@ public class FaturaUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Fatura, C
 
     public async Task<IEnumerable<FaturaResponseDto>> GetAllAsync()
     {
-        var Faturas = await _repository.GetAllAsync();
-        return Faturas.Select(u => new FaturaResponseDto
+        var faturas = await _repository
+            .GetAll()
+            .Include(f => f.Cartao) // traz o cartão junto
+            .ToListAsync();
+
+        return faturas.Select(u => new FaturaResponseDto
         {
             Id = u.Id,
             Mes = u.Mes,

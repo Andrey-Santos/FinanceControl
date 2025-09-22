@@ -1,7 +1,8 @@
-async function carregarCartoes(contaId) {
+async function carregarCartoes() {
+    debugger;
     var cartaoSelect = document.getElementById('CartaoId');
     var tipoOperacao = document.getElementById('TipoOperacao');
-    if (!cartaoSelect) return;
+    var contaId = document.getElementById('ContaBancariaId').value;
 
     cartaoSelect.innerHTML = '';
     var optDefault = document.createElement('option');
@@ -15,7 +16,7 @@ async function carregarCartoes(contaId) {
     }
 
     try {
-        var url = '/Transacao/CartoesPorConta?contaBancariaId=' + encodeURIComponent(contaId) + '&tipoOperacao=' + encodeURIComponent(tipoOperacao);
+        var url = '/Transacao/CartoesPorConta?contaBancariaId=' + encodeURIComponent(contaId) + '&tipoOperacao=' + encodeURIComponent(tipoOperacao.value);
         var resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
         if (!resp.ok) throw new Error('Falha ao carregar cartões');
         var itens = await resp.json();
@@ -40,8 +41,8 @@ async function carregarCartoes(contaId) {
 
 function carregarDadosIniciais() {
     var contaSelect = document.getElementById('ContaBancariaId');
-    if (contaSelect && contaSelect.value) {
-        carregarCartoes(contaSelect.value);
+    if (contaSelect) {
+        carregarCartoes();
     } else {
         toggleTransacao();
     }
@@ -104,10 +105,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var tipoTransacao = document.getElementById('Tipo');
     var contaSelect = document.getElementById('ContaBancariaId');
 
-    if (tipoOperacao) tipoOperacao.addEventListener('change', toggleCartao);
+    if (tipoOperacao) tipoOperacao.addEventListener('change', carregarCartoes);
     if (tipoTransacao) tipoTransacao.addEventListener('change', toggleTransacao);
     if (contaSelect) contaSelect.addEventListener('change', function () {
-        carregarCartoes(this.value);
+        carregarCartoes();
     });
 
     carregarDadosIniciais();

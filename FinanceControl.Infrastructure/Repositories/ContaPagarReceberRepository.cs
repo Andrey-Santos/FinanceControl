@@ -8,9 +8,4 @@ namespace FinanceControl.Infrastructure.Repositories;
 public class ContaPagarReceberRepository : BaseRepository<ContaPagarReceber>, IContaPagarReceberRepository
 {
     public ContaPagarReceberRepository(FinanceDbContext context) : base(context) { }
-
-    public IQueryable<ContaPagarReceber> GetAll()
-    {
-        return _context.ContaPagarReceber.AsQueryable();
-    }
 }

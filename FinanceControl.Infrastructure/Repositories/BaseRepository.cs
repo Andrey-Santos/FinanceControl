@@ -16,6 +16,11 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
         _dbSet = context.Set<TEntity>();
     }
 
+    public IQueryable<TEntity> GetAll()
+    {
+        return _dbSet;
+    }
+
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();

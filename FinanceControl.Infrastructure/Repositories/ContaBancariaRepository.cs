@@ -10,8 +10,4 @@ public class ContaBancariaRepository : BaseRepository<ContaBancaria>, IContaBanc
     {
 
     }
-    public IQueryable<ContaBancaria> GetAll()
-    {
-        return _context.ContasBancarias.AsQueryable();
-    }
 }

@@ -4,6 +4,7 @@ namespace FinanceControl.Core.Domain.Interfaces;
 
 public interface IBaseRepository<TEntity> where TEntity : EntityBase
 {
+    IQueryable<TEntity> GetAll();
     Task<IEnumerable<TEntity>> GetAllAsync();
     Task<TEntity?> GetByIdAsync(long id);
     Task AddAsync(TEntity entity);

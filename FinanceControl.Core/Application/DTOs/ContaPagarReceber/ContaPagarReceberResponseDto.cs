@@ -13,4 +13,5 @@ public class ContaPagarReceberResponseDto
     public TipoTransacao Tipo { get; set; }
     public long ContaBancariaId { get; set; }
     public string ContaBancariaNumero { get; set; } = string.Empty;
+    public long? TransacaoId { get; set; }
 }

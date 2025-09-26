@@ -14,7 +14,11 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
     private readonly TransacaoUseCase _transacaoUseCase;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ContaPagarReceberUseCase(IContaPagarReceberRepository repository, IContaBancariaRepository contaBancariaRepository, TransacaoUseCase transacaoUseCase, IUnitOfWork unitOfWork)
+    public ContaPagarReceberUseCase(
+        IContaPagarReceberRepository repository,
+        IContaBancariaRepository contaBancariaRepository,
+        TransacaoUseCase transacaoUseCase,
+        IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
@@ -24,37 +28,41 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
 
     public async Task<IEnumerable<ContaPagarReceberResponseDto>> GetAllAsync()
     {
-        var ContaPagarRecebers = await _repository
-                                .GetAll()
-                                .Include(t => t.ContaBancaria)
-                                .ToListAsync();
+        var contas = await _repository
+            .GetAll()
+            .Include(t => t.ContaBancaria)
+            .ToListAsync();
 
-        return ContaPagarRecebers.Select(u => new ContaPagarReceberResponseDto
+        return contas.Select(u => new ContaPagarReceberResponseDto
         {
             Id = u.Id,
             Descricao = u.Descricao,
             Valor = u.Valor,
             DataPagamento = u.DataPagamento,
             DataVencimento = u.DataVencimento,
+            ContaBancariaId = u.ContaBancariaId,
             ContaBancariaNumero = u.ContaBancaria.Numero,
             Tipo = u.Tipo,
             Status = u.Status,
+            TransacaoId = u.TransacaoId
         });
     }
 
     public async Task<ContaPagarReceberResponseDto?> GetByIdAsync(long id)
     {
-        var ContaPagarReceber = await _repository.GetByIdAsync(id);
+        var conta = await _repository.GetByIdAsync(id);
 
-        return ContaPagarReceber is null ? null : new ContaPagarReceberResponseDto
+        return conta is null ? null : new ContaPagarReceberResponseDto
         {
-            Id = ContaPagarReceber.Id,
-            Descricao = ContaPagarReceber.Descricao,
-            Valor = ContaPagarReceber.Valor,
-            DataPagamento = ContaPagarReceber.DataPagamento,
-            DataVencimento = ContaPagarReceber.DataVencimento,
-            ContaBancariaId = ContaPagarReceber.ContaBancariaId,
-            Tipo = ContaPagarReceber.Tipo
+            Id = conta.Id,
+            Descricao = conta.Descricao,
+            Valor = conta.Valor,
+            DataPagamento = conta.DataPagamento,
+            DataVencimento = conta.DataVencimento,
+            ContaBancariaId = conta.ContaBancariaId,
+            Tipo = conta.Tipo,
+            Status = conta.Status,
+            TransacaoId = conta.TransacaoId
         };
     }
 
@@ -62,13 +70,12 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
 
-        //if (dto.Valor <= 0)
-          //  throw new ArgumentException("O valor deve ser maior que zero.");
-
         if (!dto.DataPagamento.HasValue)
             dto.Status = StatusContaPagarReceber.Aberta;
+        else
+            dto.Status = StatusContaPagarReceber.Paga;
 
-        var ContaPagarReceber = new Domain.Entities.ContaPagarReceber
+        var conta = new Domain.Entities.ContaPagarReceber
         {
             Descricao = dto.Descricao,
             DataPagamento = dto.DataPagamento,
@@ -81,53 +88,47 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
             DataAlteracao = DateTime.UtcNow
         };
 
-        await _repository.AddAsync(ContaPagarReceber);
+        await _repository.AddAsync(conta);
         await _unitOfWork.CommitAsync();
 
-        return ContaPagarReceber.Id;
+        return conta.Id;
     }
 
     public async Task UpdateAsync(ContaPagarReceberUpdateDto dto)
     {
-        var model = new Domain.Entities.ContaPagarReceber();
+        var conta = await _repository.GetByIdAsync(dto.Id);
+        if (conta == null)
+            throw new ArgumentException("Conta não encontrada.");
 
-        model.DataAlteracao = DateTime.UtcNow;
-        model.Descricao = dto.Descricao;
-        model.DataPagamento = dto.DataPagamento;
-        model.Valor = dto.Valor;
-        model.ContaBancariaId = dto.ContaBancariaId;
-        model.Tipo = dto.Tipo;
-        model.DataVencimento = dto.DataVencimento;
-        model.Status = dto.Status;
+        conta.Descricao = dto.Descricao;
+        conta.DataPagamento = dto.DataPagamento;
+        conta.Valor = Math.Abs(dto.Valor);
+        conta.ContaBancariaId = dto.ContaBancariaId;
+        conta.Tipo = dto.Tipo;
+        conta.DataVencimento = dto.DataVencimento;
+        conta.Status = dto.DataPagamento.HasValue ? StatusContaPagarReceber.Paga : StatusContaPagarReceber.Aberta;
+        conta.DataAlteracao = DateTime.UtcNow;
 
-        await UpdateAsync(model);
+        await _repository.UpdateAsync(conta);
+        await _unitOfWork.CommitAsync();
     }
 
     public async Task UpdateAsync(Domain.Entities.ContaPagarReceber model)
     {
-        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, model.ContaBancariaId, "Conta bancária");
-
-        if (await _repository.GetByIdAsync(model.Id) == null)
+        var conta = await _repository.GetByIdAsync(model.Id);
+        if (conta == null)
             throw new ArgumentException("Conta não encontrada.");
 
-        if (model.Valor <= 0)
-            throw new ArgumentException("O valor deve ser maior que zero.");
+        conta.Descricao = model.Descricao;
+        conta.DataPagamento = model.DataPagamento;
+        conta.Valor = Math.Abs(model.Valor);
+        conta.ContaBancariaId = model.ContaBancariaId;
+        conta.Tipo = model.Tipo;
+        conta.DataVencimento = model.DataVencimento;
+        conta.Status = model.DataPagamento.HasValue ? StatusContaPagarReceber.Paga : StatusContaPagarReceber.Aberta;
+        conta.DataAlteracao = DateTime.UtcNow;
 
-        if (!model.DataPagamento.HasValue)
-            model.Status = StatusContaPagarReceber.Aberta;
-        else
-            model.Status = StatusContaPagarReceber.Paga;
-
-        model.DataAlteracao = DateTime.UtcNow;
-        model.Descricao = model.Descricao;
-        model.DataPagamento = model.DataPagamento;
-        model.Valor = model.Valor;
-        model.ContaBancariaId = model.ContaBancariaId;
-        model.Tipo = model.Tipo;
-        model.DataVencimento = model.DataVencimento;
-        model.Status = model.Status;
-
-        await _repository.UpdateAsync(model);
+        await _repository.UpdateAsync(conta);
         await _unitOfWork.CommitAsync();
     }
 
@@ -149,23 +150,27 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
                 Valor = conta.Valor,
                 DataEfetivacao = dataPagamento,
                 ContaBancariaId = conta.ContaBancariaId,
-                Tipo = conta.Tipo
+                Tipo = conta.Tipo,
+                TipoOperacao = TipoOperacao.Debito
             };
 
             conta.TransacaoId = await _transacaoUseCase.AddAsync(transacao);
         }
 
-        await UpdateAsync(conta);
+        await _repository.UpdateAsync(conta);
+        await _unitOfWork.CommitAsync();
     }
+
     public async Task DeleteAsync(long id)
     {
         await _repository.DeleteAsync(id);
         await _unitOfWork.CommitAsync();
     }
+
     public async Task<decimal> GetSaldoPrevistoProximoMes(int mesAtual, int anoAtual, long usuarioId)
     {
         var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
-        var fimMesAtual    = inicioMesAtual.AddMonths(1).AddDays(-1);
+        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
         var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
 
         var baseQuery = _repository
@@ -179,9 +184,12 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
                 t.DataPagamento,
                 t.DataVencimento
             })
-            .Where(t => t.DataVencimento >= fimMesAtual && t.DataVencimento <= fimProximoMes && t.UsuarioId == usuarioId && t.DataPagamento == null);
+            .Where(t =>
+                t.DataVencimento >= fimMesAtual &&
+                t.DataVencimento <= fimProximoMes &&
+                t.UsuarioId == usuarioId &&
+                t.DataPagamento == null);
 
         return await baseQuery.SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
-
     }
 }

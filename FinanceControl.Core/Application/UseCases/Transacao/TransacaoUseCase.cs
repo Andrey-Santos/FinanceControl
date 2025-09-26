@@ -15,91 +15,204 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
     private readonly ICartaoRepository _cartaoTransacaoRepository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
+    private readonly IContaPagarReceberRepository _contaPagarReceberRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, ICartaoRepository cartaoRepository, IFaturaRepository faturaRepository, FaturaUseCase faturaUseCase, IUnitOfWork unitOfWork)
+    public TransacaoUseCase(
+        ITransacaoRepository repository,
+        ICategoriaTransacaoRepository categoriaRepository,
+        IContaBancariaRepository contaBancariaRepository,
+        ICartaoRepository cartaoRepository,
+        IFaturaRepository faturaRepository,
+        FaturaUseCase faturaUseCase,
+        IContaPagarReceberRepository contaPagarReceberRepository,
+        IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
         _categoriaTransacaoRepository = categoriaRepository;
         _contaBancariaRepository = contaBancariaRepository;
         _cartaoTransacaoRepository = cartaoRepository;
+        _contaPagarReceberRepository = contaPagarReceberRepository;
     }
 
-    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual, long usuarioId)
+    public async Task<long> AddAsync(TransacaoCreateDto dto)
     {
-        var query = _repository.GetAll();
+        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
 
-        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
-        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
+        if ((int)dto.CategoriaId != 0)
+            await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
 
-        query = query.Where(t => t.DataEfetivacao >= inicioMesAtual);
-        query = query.Where(t => t.DataEfetivacao <= fimMesAtual);
-        query = query.Where(t => t.ContaBancaria.UsuarioId == usuarioId);
+        if ((int)(dto.CartaoId ?? 0) != 0)
+            await ValidarEntidadeExistenteAsync(_cartaoTransacaoRepository, (long)(dto.CartaoId ?? 0), "Cartão");
 
-        var transacoes = await query
-            .AsNoTracking()
-            .ToListAsync();
-
-        return transacoes.Select(t => new TransacaoResponseDto
+        var transacao = new Domain.Entities.Transacao
         {
-            Id = t.Id,
-            Descricao = t.Descricao,
-            Valor = t.Valor,
-            DataEfetivacao = t.DataEfetivacao,
-            Tipo = t.Tipo,
-            ContaBancariaId = t.ContaBancariaId,
-            TipoOperacao = t.TipoOperacao,
-            Observacao = t.Observacao,
-            CartaoId = t.CartaoId,
-            FaturaId = t.FaturaId
-        });
+            Descricao = dto.Descricao,
+            DataEfetivacao = dto.DataEfetivacao,
+            Valor = Math.Abs(dto.Valor),
+            ContaBancariaId = dto.ContaBancariaId,
+            CategoriaId = dto.CategoriaId,
+            Tipo = dto.Tipo,
+            TipoOperacao = dto.TipoOperacao,
+            Observacao = dto.Observacao,
+            CartaoId = dto.CartaoId,
+            FaturaId = dto.FaturaId,
+            DataCadastro = DateTime.UtcNow,
+            DataAlteracao = DateTime.UtcNow
+        };
+
+        if (transacao.Tipo == TipoTransacao.Receita)
+            transacao.TipoOperacao = TipoOperacao.Debito;
+
+        await _repository.AddAsync(transacao);
+        await _unitOfWork.CommitAsync();
+
+        return transacao.Id;
     }
+
     public async Task<IEnumerable<TransacaoResponseDto>> GetAllAsync()
     {
-        var Transacaos = await _repository
-                                .GetAll()
-                                .Include(t => t.ContaBancaria)
-                                .Include(t => t.Categoria)
-                                .ToListAsync();
-
-        return Transacaos.Select(u => new TransacaoResponseDto
-        {
-            Id = u.Id,
-            Descricao = u.Descricao,
-            Valor = u.Valor,
-            DataEfetivacao = u.DataEfetivacao,
-            ContaBancariaId = u.ContaBancariaId,
-            CategoriaId = u.CategoriaId,
-            ContaBancariaNumero = u.ContaBancaria.Numero,
-            CategoriaNome = u.Categoria.Nome,
-            Tipo = u.Tipo,
-            TipoOperacao = u.TipoOperacao,
-            Observacao = u.Observacao,
-            CartaoId = u.CartaoId,
-            FaturaId = u.FaturaId
-        });
+        var entities = await _repository.GetAllAsync();
+        return entities.Select(e => new TransacaoResponseDto(e));
     }
 
     public async Task<TransacaoResponseDto?> GetByIdAsync(long id)
     {
-        var Transacao = await _repository.GetByIdAsync(id);
-        return Transacao is null ? null : new TransacaoResponseDto
-        {
-            Id = Transacao.Id,
-            Descricao = Transacao.Descricao,
-            Valor = Transacao.Valor,
-            DataEfetivacao = Transacao.DataEfetivacao,
-            ContaBancariaId = Transacao.ContaBancariaId,
-            CategoriaId = Transacao.CategoriaId,
-            Tipo = Transacao.Tipo,
-            TipoOperacao = Transacao.TipoOperacao,
-            Observacao = Transacao.Observacao,
-            CartaoId = Transacao.CartaoId,
-            FaturaId = Transacao.FaturaId,
-        };
+        var entity = await _repository.GetByIdAsync(id);
+        return entity == null ? null : new TransacaoResponseDto(entity);
     }
 
+    public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mes, int ano, long usuarioId)
+    {
+        var inicio = new DateTime(ano, mes, 1);
+        var fim = inicio.AddMonths(1).AddDays(-1);
+
+        var entities = await _repository.GetAll()
+            .Where(t => t.ContaBancaria.UsuarioId == usuarioId &&
+                        t.DataEfetivacao >= inicio && t.DataEfetivacao <= fim)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return entities.Select(e => new TransacaoResponseDto(e));
+    }
+    public async Task UpdateAsync(TransacaoUpdateDto dto)
+    {
+        var entity = await _repository.GetByIdAsync(dto.Id);
+        if (entity == null) return;
+
+        entity.Descricao = dto.Descricao;
+        entity.DataEfetivacao = dto.DataEfetivacao;
+        entity.Valor = Math.Abs(dto.Valor);
+        entity.ContaBancariaId = dto.ContaBancariaId;
+        entity.CategoriaId = dto.CategoriaId;
+        entity.Tipo = dto.Tipo;
+        entity.Observacao = dto.Observacao;
+        entity.CartaoId = dto.CartaoId;
+        entity.TipoOperacao = dto.TipoOperacao;
+        entity.DataAlteracao = DateTime.UtcNow;
+
+        await _repository.UpdateAsync(entity);
+        await _unitOfWork.CommitAsync();
+    }
+
+    public async Task DeleteAsync(long id)
+    {
+        var entity = await _repository.GetByIdAsync(id);
+        if (entity == null) return;
+
+        await _repository.DeleteAsync(entity.Id);
+        await _unitOfWork.CommitAsync();
+    }
+
+    public async Task<(IEnumerable<(string Categoria, decimal Valor)> categorias,
+        IEnumerable<(string Categoria, decimal Valor)> despesas,
+        IEnumerable<(string Categoria, decimal Valor)> receitas,
+        decimal saldoAtual,
+        decimal saldoMesAnterior,
+        decimal saldoPrevistoProximoMes)> GetResumoDashboardAsync(int mesAtual, int anoAtual, long usuarioId)
+    {
+        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
+        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
+        var fimMesAnterior = inicioMesAtual.AddDays(-1);
+        var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
+
+        var baseQuery = _repository
+            .GetAll()
+            .AsNoTracking()
+            .Select(t => new
+            {
+                t.DataEfetivacao,
+                t.Valor,
+                t.Tipo,
+                t.TipoOperacao,
+                CategoriaNome = t.Categoria.Nome,
+                t.ContaBancaria.UsuarioId
+            })
+            .Where(t => t.UsuarioId == usuarioId && t.TipoOperacao == TipoOperacao.Debito);
+
+        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual);
+
+        var categoriasQuery = mesQuery
+            .GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor)
+            })
+            .Where(x => x.Valor != 0);
+
+        var despesasQuery = mesQuery
+            .GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Despesa && t.TipoOperacao != TipoOperacao.Credito ? t.Valor : 0)
+            })
+            .Where(x => x.Valor != 0);
+
+        var receitasQuery = mesQuery
+            .GroupBy(t => t.CategoriaNome)
+            .Select(g => new
+            {
+                Categoria = g.Key,
+                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : 0)
+            })
+            .Where(x => x.Valor != 0);
+
+        var categorias = await categoriasQuery.ToListAsync();
+        var despesas = await despesasQuery.ToListAsync();
+        var receitas = await receitasQuery.ToListAsync();
+
+        var saldoAtual = await baseQuery
+            .Where(t => t.DataEfetivacao <= fimMesAtual)
+            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+        var saldoMesAnterior = await baseQuery
+            .Where(t => t.DataEfetivacao <= fimMesAnterior)
+            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+        var saldoPrevistoProximoMes = await baseQuery
+            .Where(t => t.DataEfetivacao <= fimProximoMes)
+            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
+        // 👇 Ajuste: incluir contas a pagar/receber em aberto até o próximo mês
+        var contas = await _contaPagarReceberRepository.GetAllAsync();
+        var saldoContasFuturas = contas
+            .Where(c => c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
+            .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
+
+        saldoPrevistoProximoMes += saldoContasFuturas;
+
+        return (
+            categorias.Select(x => (x.Categoria, x.Valor)),
+            despesas.Select(x => (x.Categoria, x.Valor)),
+            receitas.Select(x => (x.Categoria, x.Valor)),
+            saldoAtual,
+            saldoMesAnterior,
+            saldoPrevistoProximoMes
+        );
+    }
     public async Task<IEnumerable<TransacaoResponseDto>> GetFilteredAsync(TransacaoFilterDto filtro)
     {
         var query = _repository
@@ -155,172 +268,9 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
 
         var transacoes = await query.ToListAsync();
 
-        return transacoes.Select(t => new TransacaoResponseDto
-        {
-            Id = t.Id,
-            Descricao = t.Descricao,
-            Valor = t.Valor,
-            DataEfetivacao = t.DataEfetivacao,
-            ContaBancariaId = t.ContaBancariaId,
-            CategoriaId = t.CategoriaId,
-            ContaBancariaNumero = t.ContaBancaria.Numero,
-            CategoriaNome = t.Categoria.Nome,
-            Tipo = t.Tipo,
-            TipoOperacao = t.TipoOperacao,
-            Observacao = t.Observacao,
-            CartaoId = t.CartaoId,
-            FaturaId = t.FaturaId
-        });
+        return transacoes.Select(e => new TransacaoResponseDto(e));
     }
 
-    public async Task<long> AddAsync(TransacaoCreateDto dto)
-    {
-        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
-
-        if ((int)dto.CategoriaId != 0)
-            await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
-
-        if ((int)(dto.CartaoId ?? 0) != 0)
-            await ValidarEntidadeExistenteAsync(_cartaoTransacaoRepository, (long)(dto.CartaoId ?? 0), "Cartão");
-
-        var transacao = new Domain.Entities.Transacao
-        {
-            Descricao = dto.Descricao,
-            DataEfetivacao = dto.DataEfetivacao,
-            Valor = Math.Abs(dto.Valor),
-            ContaBancariaId = dto.ContaBancariaId,
-            CategoriaId = dto.CategoriaId,
-            Tipo = dto.Tipo,
-            TipoOperacao = dto.TipoOperacao,
-            Observacao = dto.Observacao,
-            CartaoId = dto.CartaoId,
-            FaturaId = dto.FaturaId,
-            DataCadastro = DateTime.UtcNow,
-            DataAlteracao = DateTime.UtcNow
-        };
-
-        if (transacao.Tipo == TipoTransacao.Receita)
-            transacao.TipoOperacao = TipoOperacao.Debito;
-
-        await _repository.AddAsync(transacao);
-        await _unitOfWork.CommitAsync();
-
-        return transacao.Id;
-    }
-
-    public async Task UpdateAsync(TransacaoUpdateDto dto)
-    {
-        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
-        await ValidarEntidadeExistenteAsync(_categoriaTransacaoRepository, dto.CategoriaId, "Categoria de transação");
-
-        var Transacao = await _repository.GetByIdAsync(dto.Id);
-        if (Transacao == null)
-            return;
-
-        Transacao.DataAlteracao = DateTime.UtcNow;
-        Transacao.Descricao = dto.Descricao;
-        Transacao.DataEfetivacao = dto.DataEfetivacao;
-        Transacao.Valor = dto.Valor;
-        Transacao.ContaBancariaId = dto.ContaBancariaId;
-        Transacao.CategoriaId = dto.CategoriaId;
-        Transacao.Tipo = dto.Tipo;
-        Transacao.TipoOperacao = dto.TipoOperacao;
-        Transacao.Observacao = dto.Observacao;
-        Transacao.CartaoId = dto.CartaoId;
-        Transacao.FaturaId = dto.FaturaId;
-        await _repository.UpdateAsync(Transacao);
-        await _unitOfWork.CommitAsync();
-    }
-
-    public async Task DeleteAsync(long id)
-    {
-        await _repository.DeleteAsync(id);
-        await _unitOfWork.CommitAsync();
-    }
-
-    public async Task<(IEnumerable<(string Categoria, decimal Valor)> categorias,
-        IEnumerable<(string Categoria, decimal Valor)> despesas,
-        IEnumerable<(string Categoria, decimal Valor)> receitas,
-        decimal saldoAtual,
-        decimal saldoMesAnterior,
-        decimal saldoPrevistoProximoMes)> GetResumoDashboardAsync(int mesAtual, int anoAtual, long usuarioId)
-    {
-        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
-        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
-        var fimMesAnterior = inicioMesAtual.AddDays(-1);
-        var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
-
-        var baseQuery = _repository
-            .GetAll()
-            .AsNoTracking()
-            .Select(t => new
-            {
-                t.DataEfetivacao,
-                t.Valor,
-                t.Tipo,
-                t.TipoOperacao,
-                t.Observacao,
-                CategoriaNome = t.Categoria.Nome,
-                t.ContaBancaria.UsuarioId,
-                t.CartaoId,
-                t.FaturaId
-            })
-            .Where(t => t.UsuarioId == usuarioId && t.TipoOperacao == TipoOperacao.Debito);
-
-        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual);
-
-        var categoriasQuery = mesQuery
-            .GroupBy(t => t.CategoriaNome)
-            .Select(g => new
-            {
-                Categoria = g.Key,
-                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor)
-            })
-            .Where(x => x.Valor != 0);
-
-        var despesasQuery = mesQuery
-            .GroupBy(t => t.CategoriaNome)
-            .Select(g => new
-            {
-                Categoria = g.Key,
-                Valor = g.Sum(t => t.Tipo == TipoTransacao.Despesa && t.TipoOperacao != TipoOperacao.Credito ? t.Valor : 0)
-            })
-            .Where(x => x.Valor != 0);
-
-        var receitasQuery = mesQuery
-            .GroupBy(t => t.CategoriaNome)
-            .Select(g => new
-            {
-                Categoria = g.Key,
-                Valor = g.Sum(t => t.Tipo == TipoTransacao.Receita ? t.Valor : 0)
-            })
-            .Where(x => x.Valor != 0);
-
-        var categorias = await categoriasQuery.ToListAsync();
-        var despesas = await despesasQuery.ToListAsync();
-        var receitas = await receitasQuery.ToListAsync();
-
-        var saldoAtual = await baseQuery
-            .Where(t => t.UsuarioId == usuarioId && t.DataEfetivacao <= fimMesAtual)
-            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
-
-        var saldoMesAnterior = await baseQuery
-            .Where(t => t.UsuarioId == usuarioId && t.DataEfetivacao <= fimMesAnterior)
-            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
-
-        var saldoPrevistoProximoMes = await baseQuery
-            .Where(t => t.UsuarioId == usuarioId && t.DataEfetivacao <= fimProximoMes)
-            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
-
-        return (
-            categorias.Select(x => (x.Categoria, x.Valor)),
-            despesas.Select(x => (x.Categoria, x.Valor)),
-            receitas.Select(x => (x.Categoria, x.Valor)),
-            saldoAtual,
-            saldoMesAnterior,
-            saldoPrevistoProximoMes
-        );
-    }
     public async Task<int> ImportarAsync(IFormFile arquivo, long contaBancariaId)
     {
         if (arquivo == null || arquivo.Length == 0)

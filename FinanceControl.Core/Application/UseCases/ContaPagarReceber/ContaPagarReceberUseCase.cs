@@ -62,8 +62,8 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
     {
         await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
 
-        if (dto.Valor <= 0)
-            throw new ArgumentException("O valor deve ser maior que zero.");
+        //if (dto.Valor <= 0)
+          //  throw new ArgumentException("O valor deve ser maior que zero.");
 
         if (!dto.DataPagamento.HasValue)
             dto.Status = StatusContaPagarReceber.Aberta;

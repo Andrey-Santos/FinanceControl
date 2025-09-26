@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using ClosedXML.Excel;
 using FinanceControl.Core.Domain.Enums;
 using System.Globalization;
+using FinanceControl.Core.Application.UseCases.Fatura;
 
 namespace FinanceControl.Core.Application.UseCases.Transacao;
 
@@ -14,17 +15,15 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
     private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
     private readonly ICartaoRepository _cartaoTransacaoRepository;
     private readonly IContaBancariaRepository _contaBancariaRepository;
-    private readonly IFaturaRepository _faturaRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, ICartaoRepository cartaoRepository, IFaturaRepository faturaRepository, IUnitOfWork unitOfWork)
+    public TransacaoUseCase(ITransacaoRepository repository, ICategoriaTransacaoRepository categoriaRepository, IContaBancariaRepository contaBancariaRepository, ICartaoRepository cartaoRepository, IFaturaRepository faturaRepository, FaturaUseCase faturaUseCase, IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
         _categoriaTransacaoRepository = categoriaRepository;
         _contaBancariaRepository = contaBancariaRepository;
         _cartaoTransacaoRepository = cartaoRepository;
-        _faturaRepository = faturaRepository;
     }
 
     public async Task<IEnumerable<TransacaoResponseDto>> GetByFiltroAsync(int mesAtual, int anoAtual, long usuarioId)
@@ -56,7 +55,6 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             FaturaId = t.FaturaId
         });
     }
-
     public async Task<IEnumerable<TransacaoResponseDto>> GetAllAsync()
     {
         var Transacaos = await _repository
@@ -204,38 +202,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         if (transacao.Tipo == TipoTransacao.Receita)
             transacao.TipoOperacao = TipoOperacao.Debito;
 
-        else if (transacao.TipoOperacao == TipoOperacao.Credito)
-            transacao.FaturaId = await GetFatura(dto);
-
         await _repository.AddAsync(transacao);
         await _unitOfWork.CommitAsync();
 
         return transacao.Id;
-    }
-
-    public async Task<long> GetFatura(TransacaoCreateDto dto)
-    {
-        long cartaoId = (long)(dto.CartaoId ?? 0);
-
-        if ((cartaoId == 0) || (dto.TipoOperacao == TipoOperacao.Debito))
-            return 0;
-
-        var faturaId = await _faturaRepository.GetByCartaoEFaturaAsync(cartaoId, dto.DataEfetivacao.Month, dto.DataEfetivacao.Year);
-
-        if (faturaId != null)
-            return faturaId.Id;
-
-        var novaFatura = new Domain.Entities.Fatura
-        {
-            CartaoId = cartaoId,
-            Mes = (short)dto.DataEfetivacao.Month,
-            Ano = (short)dto.DataEfetivacao.Year,
-            DataCadastro = DateTime.UtcNow,
-            DataAlteracao = DateTime.UtcNow
-        };
-        await _faturaRepository.AddAsync(novaFatura);
-        await _unitOfWork.CommitAsync();
-        return novaFatura.Id;
     }
 
     public async Task UpdateAsync(TransacaoUpdateDto dto)
@@ -283,7 +253,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         var baseQuery = _repository
             .GetAll()
             .AsNoTracking()
-            .Select(t => new    
+            .Select(t => new
             {
                 t.DataEfetivacao,
                 t.Valor,
@@ -294,9 +264,10 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 t.ContaBancaria.UsuarioId,
                 t.CartaoId,
                 t.FaturaId
-            });
+            })
+            .Where(t => t.UsuarioId == usuarioId && t.TipoOperacao == TipoOperacao.Debito);
 
-        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual && t.UsuarioId == usuarioId && t.TipoOperacao == TipoOperacao.Debito);
+        var mesQuery = baseQuery.Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual);
 
         var categoriasQuery = mesQuery
             .GroupBy(t => t.CategoriaNome)
@@ -399,7 +370,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                 CategoriaId = (long)categoriaId,
                 TipoOperacao = TipoOperacao.Debito,
             };
-            
+
             transacoes.Add(transacao);
 
             await AddAsync(transacao);

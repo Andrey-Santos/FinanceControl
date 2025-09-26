@@ -3,6 +3,7 @@ using System;
 using FinanceControl.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FinanceControl.Infrastructure.Migrations
 {
     [DbContext(typeof(FinanceDbContext))]
-    partial class FinanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250922161245_UpdateRelacionamentoFatura")]
+    partial class UpdateRelacionamentoFatura
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -408,7 +411,7 @@ namespace FinanceControl.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("FinanceControl.Core.Domain.Entities.Fatura", "Fatura")
-                        .WithMany("Transacoes")
+                        .WithMany()
                         .HasForeignKey("FaturaId");
 
                     b.Navigation("Cartao");
@@ -441,11 +444,6 @@ namespace FinanceControl.Infrastructure.Migrations
                 {
                     b.Navigation("Cartoes");
 
-                    b.Navigation("Transacoes");
-                });
-
-            modelBuilder.Entity("FinanceControl.Core.Domain.Entities.Fatura", b =>
-                {
                     b.Navigation("Transacoes");
                 });
 

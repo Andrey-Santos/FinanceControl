@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using FinanceControl.Core.Application.UseCases.ContaPagarReceber;
 using Financecontrol.WebApi.Filters;
 using System.Globalization;
+using FinanceControl.Core.Application.Workflows;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,7 @@ builder.Services.AddScoped<FaturaUseCase>();
 builder.Services.AddScoped<TransacaoUseCase>();
 builder.Services.AddScoped<CategoriaTransacaoUseCase>();
 builder.Services.AddScoped<ContaPagarReceberUseCase>();
+builder.Services.AddScoped<FinanceWorkflowService>();
 
 // 🔐 JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");

@@ -1,5 +1,3 @@
-using FinanceControl.Core.Application.DTOs;
-using FinanceControl.Core.Domain.Entities;
 using FinanceControl.Core.Domain.Enums;
 
 namespace FinanceControl.Core.Application.DTOs.Transacao;
@@ -19,9 +17,9 @@ public class TransacaoResponseDto : DtoResponse
     public TipoOperacao TipoOperacao { get; set; }
     public string? Observacao { get; set; }
 
-    // Construtor que recebe a entidade
     public TransacaoResponseDto(Domain.Entities.Transacao entity)
     {
+        Id = entity.Id;
         Descricao = entity.Descricao;
         Valor = entity.Valor;
         DataEfetivacao = entity.DataEfetivacao;

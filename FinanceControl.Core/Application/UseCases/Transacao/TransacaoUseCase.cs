@@ -196,13 +196,18 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             .Where(t => t.DataEfetivacao <= fimProximoMes)
             .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
-        // 👇 Ajuste: incluir contas a pagar/receber em aberto até o próximo mês
         var contas = await _contaPagarReceberRepository.GetAllAsync();
-        var saldoContasFuturas = contas
-            .Where(c => c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
+        saldoAtual += contas
+            .Where(c => c.DataVencimento <= fimMesAtual && c.DataPagamento == null)
             .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
 
-        saldoPrevistoProximoMes += saldoContasFuturas;
+        saldoMesAnterior += contas
+            .Where(c => c.DataVencimento <= fimMesAnterior && c.DataPagamento == null)
+            .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
+
+        saldoPrevistoProximoMes += contas
+            .Where(c => c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
+            .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
 
         return (
             categorias.Select(x => (x.Categoria, x.Valor)),

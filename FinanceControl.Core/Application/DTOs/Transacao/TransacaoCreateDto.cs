@@ -14,4 +14,33 @@ public class TransacaoCreateDto
     public TipoTransacao Tipo { get; set; }
     public TipoOperacao TipoOperacao { get; set; }
     public string? Observacao { get; set; }
+    public TransacaoCreateDto()
+    {
+    }
+    public TransacaoCreateDto(Domain.Entities.Transacao model)
+    {
+        Descricao = model.Descricao;
+        Valor = model.Valor;
+        DataEfetivacao = model.DataEfetivacao;
+        ContaBancariaId = model.ContaBancariaId;
+        CategoriaId = model.CategoriaId;
+        CartaoId = model.CartaoId;
+        FaturaId = model.FaturaId;
+        Tipo = model.Tipo;
+        TipoOperacao = model.TipoOperacao;
+        Observacao = model.Observacao;
+    }
+    public TransacaoCreateDto(TransacaoResponseDto model)
+    {
+        Descricao = model.Descricao;
+        Valor = model.Valor;
+        DataEfetivacao = model.DataEfetivacao;
+        ContaBancariaId = model.ContaBancariaId;
+        CategoriaId = model.CategoriaId;
+        CartaoId = model.CartaoId;
+        FaturaId = model.FaturaId;
+        Tipo = model.Tipo;
+        TipoOperacao = model.TipoOperacao;
+        Observacao = model.Observacao;
+    }
 }

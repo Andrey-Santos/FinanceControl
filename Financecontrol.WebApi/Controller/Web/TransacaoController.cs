@@ -37,7 +37,6 @@ public class TransacaoController : Controller
     {
         await LoadLists(filtro);
 
-        // Aqui pode chamar direto o usecase se quiser apenas leitura
         var result = filtro is null
             ? await _workflow.GetAllTransacoesAsync()
             : await _workflow.GetFilteredTransacoesAsync(filtro);
@@ -109,20 +108,7 @@ public class TransacaoController : Controller
 
         await LoadLists();
 
-        var dto = new TransacaoUpdateDto
-        {
-            Id = entity.Id,
-            Descricao = entity.Descricao,
-            DataEfetivacao = entity.DataEfetivacao,
-            Valor = entity.Valor,
-            ContaBancariaId = entity.ContaBancariaId,
-            CategoriaId = entity.CategoriaId,
-            Tipo = entity.Tipo,
-            Observacao = entity.Observacao,
-            CartaoId = entity.CartaoId,
-            TipoOperacao = entity.TipoOperacao,
-        };
-
+        var dto = new TransacaoUpdateDto(entity);
         return View(dto);
     }
 

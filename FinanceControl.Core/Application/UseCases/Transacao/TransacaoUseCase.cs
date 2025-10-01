@@ -125,17 +125,19 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task<(IEnumerable<(string Categoria, decimal Valor)> categorias,
+    public async Task<(IEnumerable<(string Categoria, decimal Valor)>
+        categorias,
         IEnumerable<(string Categoria, decimal Valor)> despesas,
         IEnumerable<(string Categoria, decimal Valor)> receitas,
         decimal saldoAtual,
         decimal saldoMesAnterior,
         decimal saldoPrevistoProximoMes)> GetResumoDashboardAsync(int mesAtual, int anoAtual, long usuarioId)
     {
-        var inicioMesAtual = new DateTime(anoAtual, mesAtual, 1);
-        var fimMesAtual = inicioMesAtual.AddMonths(1).AddDays(-1);
-        var fimMesAnterior = inicioMesAtual.AddDays(-1);
-        var fimProximoMes = inicioMesAtual.AddMonths(2).AddDays(-1);
+        var inicioMesAtual   = new DateTime(anoAtual, mesAtual, 1);
+        var fimMesAtual      = inicioMesAtual.AddMonths(1).AddDays(-1);
+        var fimMesAnterior   = inicioMesAtual.AddDays(-1);
+        var fimProximoMes    = inicioMesAtual.AddMonths(2).AddDays(-1);
+        var inicioProximoMes = new DateTime(fimProximoMes.Year, fimProximoMes.Month, 1);
 
         var baseQuery = _repository
             .GetAll()
@@ -181,33 +183,31 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
             .Where(x => x.Valor != 0);
 
         var categorias = await categoriasQuery.ToListAsync();
-        var despesas = await despesasQuery.ToListAsync();
-        var receitas = await receitasQuery.ToListAsync();
-
-        var saldoAtual = await baseQuery
-            .Where(t => t.DataEfetivacao <= fimMesAtual)
-            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+        var despesas   = await despesasQuery.ToListAsync();
+        var receitas   = await receitasQuery.ToListAsync();
+        var contas     = await _contaPagarReceberRepository.GetAllAsync();
 
         var saldoMesAnterior = await baseQuery
             .Where(t => t.DataEfetivacao <= fimMesAnterior)
             .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
-        var saldoPrevistoProximoMes = await baseQuery
-            .Where(t => t.DataEfetivacao <= fimProximoMes)
-            .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
-
-        var contas = await _contaPagarReceberRepository.GetAllAsync();
-        saldoAtual += contas
-            .Where(c => c.DataVencimento <= fimMesAtual && c.DataPagamento == null)
-            .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
-
         saldoMesAnterior += contas
             .Where(c => c.DataVencimento <= fimMesAnterior && c.DataPagamento == null)
             .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
 
+        var saldoAtual = saldoMesAnterior;
+        saldoAtual += await baseQuery
+                        .Where(t => t.DataEfetivacao >= inicioMesAtual && t.DataEfetivacao <= fimMesAtual)
+                        .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+        
+        var saldoPrevistoProximoMes = saldoAtual;
+        saldoPrevistoProximoMes += await baseQuery
+                                    .Where(t => t.DataEfetivacao >= inicioProximoMes && t.DataEfetivacao <= fimProximoMes)
+                                    .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
+
         saldoPrevistoProximoMes += contas
-            .Where(c => c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
-            .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
+                                    .Where(c => c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
+                                    .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
 
         return (
             categorias.Select(x => (x.Categoria, x.Valor)),

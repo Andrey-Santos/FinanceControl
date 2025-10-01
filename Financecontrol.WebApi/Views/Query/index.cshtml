@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Console DML";
+}
+
+<h2>Console DML</h2>
+
+<form method="post" asp-action="Execute">
+    <textarea name="sqlQuery" rows="8" cols="100" placeholder="Digite sua query SQL aqui">@ViewBag.Query</textarea>
+    <br />
+    <button type="submit">Executar</button>
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <div style="margin-top:12px;color:green;">
+        <strong>@ViewBag.Message</strong>
+    </div>
+}
+
+@if (ViewBag.Error != null)
+{
+    <div style="margin-top:12px;color:red;">
+        <strong>@ViewBag.Error</strong>
+    </div>
+}

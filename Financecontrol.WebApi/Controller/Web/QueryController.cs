@@ -1,21 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using System.Data.SqlClient; // troque para Npgsql ou MySql se usar outro banco
+using Npgsql;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
 
 namespace FinanceControl.WebApi.Controllers;
 
 [JwtAuthorize]
 public class QueryController : Controller
 {
-    private readonly IConfiguration _config;
     private readonly string? _connectionString;
 
     public QueryController(IConfiguration config)
     {
-        _config = config;
-        _connectionString = _config.GetConnectionString("DefaultConnection");
+        _connectionString = config.GetConnectionString("DefaultConnection");
     }
 
     [HttpGet]
@@ -36,16 +32,13 @@ public class QueryController : Controller
 
         try
         {
-            using var conn = new SqlConnection(_connectionString);
+            await using var conn = new NpgsqlConnection(_connectionString);
             await conn.OpenAsync();
 
-            using var cmd = conn.CreateCommand();
-            cmd.CommandTimeout = 120; // 2 minutos
-            cmd.CommandText = sqlQuery;
-
+            await using var cmd = new NpgsqlCommand(sqlQuery, conn);
             int affected = await cmd.ExecuteNonQueryAsync();
 
-            ViewBag.Message = $"Query executada com sucesso. Linhas afetadas: {affected}";
+            ViewBag.Message = $"Executado com sucesso. Linhas afetadas: {affected}";
         }
         catch (Exception ex)
         {

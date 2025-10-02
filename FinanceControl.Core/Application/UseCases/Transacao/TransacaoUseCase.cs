@@ -206,7 +206,7 @@ public class TransacaoUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.Transa
                                     .SumAsync(t => t.Tipo == TipoTransacao.Receita ? t.Valor : -t.Valor);
 
         saldoPrevistoProximoMes += contas
-                                    .Where(c => c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
+                                    .Where(c => c.DataVencimento >= inicioProximoMes && c.DataVencimento <= fimProximoMes && c.DataPagamento == null)
                                     .Sum(c => c.Tipo == TipoTransacao.Receita ? c.Valor : -c.Valor);
 
         return (

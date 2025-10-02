@@ -42,23 +42,23 @@ public class HomeController : Controller
         // Gráficos de categorias
         ViewBag.GraficoCategoriasLabels = categorias.Select(c => c.Categoria).ToList();
         ViewBag.GraficoCategoriasValores = categorias.Select(c => Math.Abs(c.Valor)).ToList();
+
         var cores = new[] { "#007bff", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#20c997", "#fd7e14", "#17a2b8", "#343a40", "#6610f2" };
         ViewBag.GraficoCategoriasCores = categorias.Select((c, i) => cores[i % cores.Length]).ToList();
 
         // Gráficos de despesas
-        ViewBag.GraficoDespesasLabels = despesas.Select(c => c.Categoria).ToList();
+        ViewBag.GraficoDespesasLabels  = despesas.Select(c => c.Categoria).ToList();
         ViewBag.GraficoDespesasValores = despesas.Select(c => Math.Abs(c.Valor)).ToList();
-        ViewBag.GraficoDespesasCores = despesas.Select((c, i) => cores[i % cores.Length]).ToList();
+        ViewBag.GraficoDespesasCores   = despesas.Select((c, i) => cores[i % cores.Length]).ToList();
 
         // Gráficos de receitas
-        ViewBag.GraficoReceitasLabels = receitas.Select(c => c.Categoria).ToList();
+        ViewBag.GraficoReceitasLabels  = receitas.Select(c => c.Categoria).ToList();
         ViewBag.GraficoReceitasValores = receitas.Select(c => Math.Abs(c.Valor)).ToList();
-        ViewBag.GraficoReceitasCores = receitas.Select((c, i) => cores[i % cores.Length]).ToList();
+        ViewBag.GraficoReceitasCores   = receitas.Select((c, i) => cores[i % cores.Length]).ToList();
 
         // Totalizadores
-        ViewBag.SaldoAtual = saldoAtual;
-        ViewBag.SaldoMesAnterior = saldoMesAnterior;
-
+        ViewBag.SaldoAtual              = saldoAtual;
+        ViewBag.SaldoMesAnterior        = saldoMesAnterior;
         ViewBag.SaldoPrevistoProximoMes = saldoPrevistoProximoMes;
 
         ViewBag.MesAtual = mes;

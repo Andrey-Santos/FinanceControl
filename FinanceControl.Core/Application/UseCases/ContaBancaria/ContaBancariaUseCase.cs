@@ -2,6 +2,7 @@ using FinanceControl.Core.Domain.Interfaces;
 using FinanceControl.Core.Application.DTOs.ContaBancaria;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
 
 namespace FinanceControl.Core.Application.UseCases.ContaBancaria;
 

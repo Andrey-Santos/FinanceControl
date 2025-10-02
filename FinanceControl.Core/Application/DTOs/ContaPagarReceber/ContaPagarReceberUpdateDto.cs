@@ -11,5 +11,6 @@ public class ContaPagarReceberUpdateDto
     public DateTime? DataPagamento { get; set; }
     public TipoTransacao Tipo { get; set; }
     public StatusContaPagarReceber Status { get; set; }
+    public long? CategoriaId { get; set; }
     public long ContaBancariaId { get; set; }
 }

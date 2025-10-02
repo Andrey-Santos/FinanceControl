@@ -12,6 +12,8 @@ public class ContaPagarReceber : EntityBase
     public DateTime? DataPagamento { get; set; }
     public StatusContaPagarReceber Status { get; set; }
     public TipoTransacao Tipo { get; set; }
+    public long? CategoriaId { get; set; }
+    public CategoriaTransacao Categoria { get; set; } = null!;
     public long ContaBancariaId { get; set; }
     public ContaBancaria ContaBancaria { get; set; } = null!;
     public long? TransacaoId { get; set; }

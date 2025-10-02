@@ -11,6 +11,7 @@ public class ContaPagarReceberResponseDto
     public DateTime? DataPagamento { get; set; }
     public StatusContaPagarReceber Status { get; set; }
     public TipoTransacao Tipo { get; set; }
+    public long? CategoriaId { get; set; }
     public long ContaBancariaId { get; set; }
     public string ContaBancariaNumero { get; set; } = string.Empty;
     public long? TransacaoId { get; set; }

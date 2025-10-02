@@ -10,13 +10,14 @@ namespace Financecontrol.WebApi.Controllers.Web;
 public class ContaBancariaController : Controller
 {
     private readonly ContaBancariaUseCase _useCase;
-
+    private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
     private readonly IBancoRepository _bancoRepository;
 
-    public ContaBancariaController(ContaBancariaUseCase useCase, IBancoRepository bancoRepository)
+    public ContaBancariaController(ContaBancariaUseCase useCase, IBancoRepository bancoRepository, ICategoriaTransacaoRepository categoriaTransacaoRepository)
     {
         _useCase = useCase;
         _bancoRepository = bancoRepository;
+        _categoriaTransacaoRepository = categoriaTransacaoRepository;
     }
 
     [HttpGet]
@@ -25,11 +26,15 @@ public class ContaBancariaController : Controller
         return View(await _useCase.GetAllAsync());
     }
 
+    private async Task LoadLists()
+    {
+        ViewBag.Bancos = new SelectList(await _bancoRepository.GetAllAsync(), "Id", "Nome");
+    }
+
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var bancos = await _bancoRepository.GetAllAsync();
-        ViewBag.Bancos = new SelectList(bancos, "Id", "Nome");
+        await LoadLists();
         return View();
     }
 
@@ -61,14 +66,13 @@ public class ContaBancariaController : Controller
         if (entity == null)
             return NotFound();
 
-        var bancos = await _bancoRepository.GetAllAsync();
-        ViewBag.Bancos = new SelectList(bancos, "Id", "Nome");
-
         var dto = new ContaBancariaUpdateDto
         {
             Numero = entity.Numero,
             BancoId = entity.BancoId,
         };
+
+        await LoadLists();
 
         return View(dto);
     }

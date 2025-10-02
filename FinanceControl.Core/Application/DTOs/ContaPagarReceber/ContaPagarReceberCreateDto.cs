@@ -10,6 +10,6 @@ public class ContaPagarReceberCreateDto
     public DateTime? DataPagamento { get; set; }
     public TipoTransacao Tipo { get; set; }
     public long ContaBancariaId { get; set; }
-
+    public long CategoriaId { get; set; }
     public StatusContaPagarReceber Status { get; set; }
 }

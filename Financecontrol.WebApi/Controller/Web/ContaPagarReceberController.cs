@@ -10,20 +10,20 @@ namespace Financecontrol.WebApi.Controllers.Web;
 public class ContaPagarReceberController : Controller
 {
     private readonly ContaPagarReceberUseCase _useCase;
-
     private readonly IContaBancariaRepository _contasBancariasRepository;
+    private readonly ICategoriaTransacaoRepository _categoriaTransacaoRepository;
 
-    public ContaPagarReceberController(ContaPagarReceberUseCase useCase, IContaBancariaRepository contasBancariasRepository)
+    public ContaPagarReceberController(ContaPagarReceberUseCase useCase, IContaBancariaRepository contasBancariasRepository, ICategoriaTransacaoRepository categoriaTransacaoRepository)
     {
         _useCase = useCase;
         _contasBancariasRepository = contasBancariasRepository;
+        _categoriaTransacaoRepository = categoriaTransacaoRepository;
     }
 
     public async Task LoadLists()
     {
-        var contas = await _contasBancariasRepository.GetAllAsync();
-
-        ViewBag.Contas = new SelectList(contas, "Id", "Numero");
+        ViewBag.Categorias = new SelectList(await _categoriaTransacaoRepository.GetAllAsync(), "Id", "Nome");
+        ViewBag.Contas     = new SelectList(await _contasBancariasRepository.GetAllAsync(), "Id", "Numero");
     }
 
     [HttpGet]
@@ -76,8 +76,9 @@ public class ContaPagarReceberController : Controller
             Valor = entity.Valor,
             Tipo = entity.Tipo,
             ContaBancariaId = entity.ContaBancariaId,
+            CategoriaId = entity.CategoriaId,
             DataVencimento = entity.DataVencimento,
-            DataPagamento = entity.DataPagamento ?? default(DateTime),
+            DataPagamento = entity.DataPagamento ?? null,
         };
 
         return View(dto);

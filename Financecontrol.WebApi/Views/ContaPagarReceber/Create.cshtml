@@ -38,12 +38,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="ContaBancariaId" class="form-label"></label>
-                    <select asp-for="ContaBancariaId" class="form-select" asp-items="ViewBag.Contas"></select>
-                    <span asp-validation-for="ContaBancariaId" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
                     <label asp-for="CategoriaId" class="form-label">Categoria</label>
                     <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="form-select">
                         <option value="">Selecione...</option>

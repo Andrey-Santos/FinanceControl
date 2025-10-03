@@ -14,7 +14,7 @@ public class ContaPagarReceber : EntityBase
     public TipoTransacao Tipo { get; set; }
     public long? CategoriaId { get; set; }
     public CategoriaTransacao Categoria { get; set; } = null!;
-    public long ContaBancariaId { get; set; }
+    public long? ContaBancariaId { get; set; }
     public ContaBancaria ContaBancaria { get; set; } = null!;
     public long? TransacaoId { get; set; }
     public Transacao? Transacao { get; set; }

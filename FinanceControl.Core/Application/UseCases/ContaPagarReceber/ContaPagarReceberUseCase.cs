@@ -10,19 +10,16 @@ namespace FinanceControl.Core.Application.UseCases.ContaPagarReceber;
 public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entities.ContaPagarReceber, ContaPagarReceberCreateDto, ContaPagarReceberResponseDto, ContaPagarReceberUpdateDto>
 {
     private readonly IContaPagarReceberRepository _repository;
-    private readonly IContaBancariaRepository _contaBancariaRepository;
     private readonly TransacaoUseCase _transacaoUseCase;
     private readonly IUnitOfWork _unitOfWork;
 
     public ContaPagarReceberUseCase(
         IContaPagarReceberRepository repository,
-        IContaBancariaRepository contaBancariaRepository,
         TransacaoUseCase transacaoUseCase,
         IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _repository = repository;
-        _contaBancariaRepository = contaBancariaRepository;
         _transacaoUseCase = transacaoUseCase;
     }
 
@@ -30,7 +27,6 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
     {
         var contas = await _repository
             .GetAll()
-            .Include(t => t.ContaBancaria)
             .ToListAsync();
 
         return contas.Select(u => new ContaPagarReceberResponseDto
@@ -40,8 +36,7 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
             Valor = u.Valor,
             DataPagamento = u.DataPagamento,
             DataVencimento = u.DataVencimento,
-            ContaBancariaId = u.ContaBancariaId,
-            ContaBancariaNumero = u.ContaBancaria.Numero,
+            ContaBancariaId = u.ContaBancariaId ?? 0,
             Tipo = u.Tipo,
             Status = u.Status,
             TransacaoId = u.TransacaoId
@@ -59,7 +54,7 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
             Valor = conta.Valor,
             DataPagamento = conta.DataPagamento,
             DataVencimento = conta.DataVencimento,
-            ContaBancariaId = conta.ContaBancariaId,
+            ContaBancariaId = conta.ContaBancariaId ?? 0,
             CategoriaId = conta.CategoriaId,
             Tipo = conta.Tipo,
             Status = conta.Status,
@@ -69,14 +64,12 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
 
     public async Task<long> AddAsync(ContaPagarReceberCreateDto dto)
     {
-        await ValidarEntidadeExistenteAsync(_contaBancariaRepository, dto.ContaBancariaId, "Conta bancária");
-
         var conta = new Domain.Entities.ContaPagarReceber
         {
             Descricao = dto.Descricao,
             DataPagamento = dto.DataPagamento,
             Valor = Math.Abs(dto.Valor),
-            ContaBancariaId = dto.ContaBancariaId,
+            ContaBancariaId = dto.ContaBancariaId == 0 ? null : dto.ContaBancariaId,
             DataVencimento = dto.DataVencimento,
             Tipo = dto.Tipo,
             Status = dto.DataPagamento.HasValue ? StatusContaPagarReceber.Paga : StatusContaPagarReceber.Aberta,
@@ -128,7 +121,7 @@ public class ContaPagarReceberUseCase : BaseUseCase, IBaseUseCase<Domain.Entitie
                 Descricao = conta.Descricao,
                 Valor = conta.Valor,
                 DataEfetivacao = dataPagamento,
-                ContaBancariaId = conta.ContaBancariaId,
+                ContaBancariaId = conta.ContaBancariaId ?? 0,
                 Tipo = conta.Tipo,
                 TipoOperacao = TipoOperacao.Debito
             };

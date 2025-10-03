@@ -75,7 +75,6 @@ public class ContaPagarReceberController : Controller
             Descricao = entity.Descricao,
             Valor = entity.Valor,
             Tipo = entity.Tipo,
-            ContaBancariaId = entity.ContaBancariaId,
             CategoriaId = entity.CategoriaId,
             DataVencimento = entity.DataVencimento,
             DataPagamento = entity.DataPagamento ?? null,

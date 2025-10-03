@@ -26,7 +26,6 @@
                 <th>Data Pagamento</th>
                 <th>Status</th>
                 <th>Tipo</th>
-                <th>Conta Bancária</th>
             </tr>
         </thead>
         <tbody>
@@ -47,7 +46,6 @@
                     <td>@(conta.DataPagamento.HasValue? conta.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
                     <td class="@statusClass">@conta.Status</td>
                     <td>@conta.Tipo</td>
-                    <td>@conta.ContaBancariaNumero</td>
                 </tr>
             }
         </tbody>
